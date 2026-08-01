@@ -5,6 +5,9 @@ import { useSession } from 'next-auth/react';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
+
+const isUploadedImage = (src: string) => src.startsWith('/uploads/');
+
 import type { Job } from '@prisma/client';
 
 // İş ilanına göre doğru fotoğrafı döndüren yardımcı fonksiyon
@@ -72,17 +75,26 @@ export default function HomeClient({ jobs }: { jobs: Job[] }) {
     <>
       {/* 🚀 DEV HERO JOB SLIDER */}
       <section id="jobs-slider" className="hero-slider">
-        {/* Arka Plan Görseli — next/image ile optimize */}
-        <Image
-          src={bgImage}
-          alt={title}
-          fill
-          priority
-          sizes="100vw"
-          quality={75}
-          className="hero-slider-bg-image"
-          style={{ objectFit: 'cover' }}
-        />
+        {/* Arka Plan Görseli */}
+        {isUploadedImage(bgImage) ? (
+          <img
+            src={bgImage}
+            alt={title}
+            className="hero-slider-bg-image"
+            style={{ objectFit: 'cover', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+          />
+        ) : (
+          <Image
+            src={bgImage}
+            alt={title}
+            fill
+            priority
+            sizes="100vw"
+            quality={75}
+            className="hero-slider-bg-image"
+            style={{ objectFit: 'cover' }}
+          />
+        )}
         <div className="hero-slider-overlay" />
 
         {/* Ana İçerik */}

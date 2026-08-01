@@ -6,6 +6,8 @@ import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import type { Job } from '@prisma/client';
 
+const isUploadedImage = (src: string) => src.startsWith('/uploads/');
+
 function CustomSelect({ 
   options, 
   value, 
@@ -230,14 +232,22 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
                   return (
                     <div className={`job-card fade-in fade-in-delay-${(idx % 3) + 1}`} key={job.id}>
                       <div className="job-card-image">
-                        <Image
-                          src={bgImage}
-                          alt={title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          quality={70}
-                          style={{ objectFit: 'cover' }}
-                        />
+                        {isUploadedImage(bgImage) ? (
+                          <img
+                            src={bgImage}
+                            alt={title}
+                            style={{ objectFit: 'cover', width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
+                          />
+                        ) : (
+                          <Image
+                            src={bgImage}
+                            alt={title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            quality={70}
+                            style={{ objectFit: 'cover' }}
+                          />
+                        )}
                         <span className="job-badge">{job.type}</span>
                       </div>
                       <div className="job-card-content">
