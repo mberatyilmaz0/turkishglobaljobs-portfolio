@@ -60,7 +60,7 @@ export default function AdminSidebar() {
         <Link href="/admin" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div className="ap-sidebar-logo-icon">K</div>
           <div>
-            <div className="ap-sidebar-logo-text">KariyerPortal</div>
+            <div className="ap-sidebar-logo-text">Turkish Global</div>
             <div className="ap-sidebar-logo-sub">Yönetim Paneli</div>
           </div>
         </Link>

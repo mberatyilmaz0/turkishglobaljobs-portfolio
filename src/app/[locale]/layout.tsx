@@ -22,7 +22,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: 'KariyerPortal',
+  title: 'Turkish Global',
   description: 'Kariyer fırsatlarını keşfedin ve başvurun',
 };
 

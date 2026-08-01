@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   if (!job) return { title: 'İlan Bulunamadı' };
 
   return {
-    title: `${locale === 'de' ? job.titleDe || job.title : job.title} | KariyerPortal`,
+    title: `${locale === 'de' ? job.titleDe || job.title : job.title} | Turkish Global`,
     description: locale === 'de' ? job.shortDescDe || job.shortDesc : job.shortDesc,
   };
 }
