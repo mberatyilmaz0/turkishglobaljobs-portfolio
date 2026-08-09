@@ -1171,6 +1171,11 @@ img { max-width: 100%; height: auto; }
   top: 100px;
   height: fit-content;
 }
+@media (max-width: 900px) {
+  .jobs-sidebar {
+    position: static;
+  }
+}
 .filter-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
