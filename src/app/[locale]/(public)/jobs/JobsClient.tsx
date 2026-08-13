@@ -6,7 +6,6 @@ import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import type { Job } from '@prisma/client';
 
-const isUploadedImage = (src: string) => src.startsWith('/uploads/');
 
 function CustomSelect({ 
   options, 
@@ -110,11 +109,11 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
     if (imageUrl) return imageUrl;
     const t = title.toLowerCase();
     if (t.includes('yazılım') || t.includes('software')) return '/img/yazilimci.jpg';
-    if (t.includes('grafik') || t.includes('design')) return '/img/grafik-tasarim-uzmani.jpg';
-    if (t.includes('müşteri') || t.includes('kunden')) return '/img/musteriiliskileri.jpg';
+    if (t.includes('grafik') || t.includes('design')) return '/img/grafik-tasarim-uzmani.webp';
+    if (t.includes('müşteri') || t.includes('kunden')) return '/img/musteriiliskileri.webp';
     if (t.includes('pazarlama') || t.includes('marketing')) return '/img/dijitalpazarlama.jpeg';
     if (t.includes('resepsiyon') || t.includes('rezeptionist')) return '/img/otelresepsiyon.jpg';
-    if (t.includes('muhasebe') || t.includes('buchhaltung')) return '/img/muhasebeuzmanı.png';
+    if (t.includes('muhasebe') || t.includes('buchhaltung')) return '/img/muhasebeuzmanı.webp';
     return '/img/yazilimci.jpg'; 
   };
 
@@ -150,7 +149,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
         
         <aside className="jobs-sidebar">
           <div className="filter-card fade-in">
-            <h3>Filtreler</h3>
+            <h2>Filtreler</h2>
             
             <div className="filter-group">
               <label>Şehir (Konum)</label>
@@ -232,22 +231,14 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
                   return (
                     <div className={`job-card fade-in fade-in-delay-${(idx % 3) + 1}`} key={job.id}>
                       <div className="job-card-image">
-                        {isUploadedImage(bgImage) ? (
-                          <img
-                            src={bgImage}
-                            alt={title}
-                            style={{ objectFit: 'cover', width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
-                          />
-                        ) : (
-                          <Image
-                            src={bgImage}
-                            alt={title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            quality={70}
-                            style={{ objectFit: 'cover' }}
-                          />
-                        )}
+                        <Image
+                          src={bgImage}
+                          alt={title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          quality={70}
+                          style={{ objectFit: 'cover' }}
+                        />
                         <span className="job-badge">{job.type}</span>
                       </div>
                       <div className="job-card-content">

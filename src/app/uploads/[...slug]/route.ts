@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { Readable } from 'stream';
 
 export async function GET(
   request: NextRequest,
@@ -24,7 +25,8 @@ export async function GET(
       return new NextResponse('Not found', { status: 404 });
     }
 
-    const fileBuffer = fs.readFileSync(filePath);
+    // Dosya boyutunu al
+    const stat = fs.statSync(filePath);
     
     // Mime type belirleme
     const ext = path.extname(filePath).toLowerCase();
@@ -34,10 +36,15 @@ export async function GET(
     else if (ext === '.webp') contentType = 'image/webp';
     else if (ext === '.gif') contentType = 'image/gif';
     else if (ext === '.svg') contentType = 'image/svg+xml';
+
+    // Stream tabanlı dosya sunumu — RAM'e tamamen yüklemeden parça parça sun
+    const nodeStream = fs.createReadStream(filePath);
+    const webStream = Readable.toWeb(nodeStream) as ReadableStream;
     
-    return new NextResponse(fileBuffer, {
+    return new Response(webStream, {
       headers: {
         'Content-Type': contentType,
+        'Content-Length': stat.size.toString(),
         'Cache-Control': 'public, max-age=31536000, immutable',
       },
     });

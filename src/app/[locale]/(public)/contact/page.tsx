@@ -1,5 +1,22 @@
 import { getTranslations } from 'next-intl/server';
 import { getSettings } from '@/actions/settings';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const isDE = locale === 'de';
+
+  return {
+    title: isDE ? 'Kontakt' : 'İletişim',
+    description: isDE
+      ? 'Kontaktieren Sie Turkish Global. Erreichen Sie uns über Adresse, Telefon und E-Mail. Für Bewerbungen besuchen Sie bitte unsere Stellenangebote-Seite.'
+      : 'Turkish Global ile iletişime geçin. Adres, telefon ve e-posta bilgilerimiz üzerinden bize ulaşın. İş başvuruları için İş İlanları sayfamızı ziyaret edin.',
+    robots: {
+      index: false,
+      follow: true,
+    },
+  };
+}
 
 export default async function ContactPage() {
   const tc = await getTranslations('common');
@@ -20,14 +37,14 @@ export default async function ContactPage() {
           {/* Adres Kartı */}
           <div className="contact-card">
             <div className="contact-icon">📍</div>
-            <h3>{t('addressTitle')}</h3>
+            <h2>{t('addressTitle')}</h2>
             <p style={{ whiteSpace: 'pre-line' }}>{settings.address}</p>
           </div>
 
           {/* E-posta Kartı */}
           <div className="contact-card">
             <div className="contact-icon">✉️</div>
-            <h3>{t('emailTitle')}</h3>
+            <h2>{t('emailTitle')}</h2>
             <p>
               {settings.email.split('\n').map((email, i) => (
                 <span key={i}>
@@ -40,7 +57,7 @@ export default async function ContactPage() {
           {/* Telefon Kartı */}
           <div className="contact-card">
             <div className="contact-icon">📞</div>
-            <h3>{t('phoneTitle')}</h3>
+            <h2>{t('phoneTitle')}</h2>
             <p>
               {settings.phone.split('\n').map((phone, i) => (
                 <span key={i}>

@@ -6,7 +6,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 
-const isUploadedImage = (src: string) => src.startsWith('/uploads/');
 
 import type { Job } from '@prisma/client';
 
@@ -17,11 +16,11 @@ const getJobImage = (title: string, imageUrl?: string | null) => {
 
   const t = title.toLowerCase();
   if (t.includes('yazılım') || t.includes('software')) return '/img/yazilimci.jpg';
-  if (t.includes('grafik') || t.includes('design')) return '/img/grafik-tasarim-uzmani.jpg';
-  if (t.includes('müşteri') || t.includes('kunden')) return '/img/musteriiliskileri.jpg';
+  if (t.includes('grafik') || t.includes('design')) return '/img/grafik-tasarim-uzmani.webp';
+  if (t.includes('müşteri') || t.includes('kunden')) return '/img/musteriiliskileri.webp';
   if (t.includes('pazarlama') || t.includes('marketing')) return '/img/dijitalpazarlama.jpeg';
   if (t.includes('resepsiyon') || t.includes('rezeptionist')) return '/img/otelresepsiyon.jpg';
-  if (t.includes('muhasebe') || t.includes('buchhaltung')) return '/img/muhasebeuzmanı.png';
+  if (t.includes('muhasebe') || t.includes('buchhaltung')) return '/img/muhasebeuzmanı.webp';
   return '/img/yazilimci.jpg'; // Varsayılan görsel
 };
 
@@ -76,25 +75,16 @@ export default function HomeClient({ jobs }: { jobs: Job[] }) {
       {/* 🚀 DEV HERO JOB SLIDER */}
       <section id="jobs-slider" className="hero-slider">
         {/* Arka Plan Görseli */}
-        {isUploadedImage(bgImage) ? (
-          <img
-            src={bgImage}
-            alt={title}
-            className="hero-slider-bg-image"
-            style={{ objectFit: 'cover', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-          />
-        ) : (
-          <Image
-            src={bgImage}
-            alt={title}
-            fill
-            priority
-            sizes="100vw"
-            quality={75}
-            className="hero-slider-bg-image"
-            style={{ objectFit: 'cover' }}
-          />
-        )}
+        <Image
+          src={bgImage}
+          alt={title}
+          fill
+          priority
+          sizes="100vw"
+          quality={75}
+          className="hero-slider-bg-image"
+          style={{ objectFit: 'cover' }}
+        />
         <div className="hero-slider-overlay" />
 
         {/* Ana İçerik */}

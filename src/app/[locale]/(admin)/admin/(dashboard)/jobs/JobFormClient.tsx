@@ -9,11 +9,11 @@ import type { Job } from '@prisma/client';
 const getJobImage = (title: string) => {
   const t = title.toLowerCase();
   if (t.includes('yazılım') || t.includes('software')) return '/img/yazilimci.jpg';
-  if (t.includes('grafik') || t.includes('design')) return '/img/grafik-tasarim-uzmani.jpg';
-  if (t.includes('müşteri') || t.includes('kunden')) return '/img/musteriiliskileri.jpg';
+  if (t.includes('grafik') || t.includes('design')) return '/img/grafik-tasarim-uzmani.webp';
+  if (t.includes('müşteri') || t.includes('kunden')) return '/img/musteriiliskileri.webp';
   if (t.includes('pazarlama') || t.includes('marketing')) return '/img/dijitalpazarlama.jpeg';
   if (t.includes('resepsiyon') || t.includes('rezeptionist')) return '/img/otelresepsiyon.jpg';
-  if (t.includes('muhasebe') || t.includes('buchhaltung')) return '/img/muhasebeuzmanı.png';
+  if (t.includes('muhasebe') || t.includes('buchhaltung')) return '/img/muhasebeuzmanı.webp';
   return null;
 };
 
@@ -39,6 +39,23 @@ export default function JobFormClient({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Client-side dosya boyutu kontrolü (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setToast('Dosya boyutu 10MB\'ı aşamaz!');
+      setTimeout(() => setToast(''), 4000);
+      e.target.value = '';
+      return;
+    }
+
+    // Client-side MIME type kontrolü
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      setToast('Sadece JPG, PNG, WebP ve GIF dosyaları kabul edilir!');
+      setTimeout(() => setToast(''), 4000);
+      e.target.value = '';
+      return;
+    }
+
     // Önizleme
     const reader = new FileReader();
     reader.onload = (ev) => setImagePreview(ev.target?.result as string);
@@ -54,6 +71,9 @@ export default function JobFormClient({
       const data = await res.json();
       if (data.url) {
         setUploadedImageUrl(data.url);
+      } else if (data.error) {
+        setToast(data.error);
+        setTimeout(() => setToast(''), 4000);
       }
     } catch {
       setToast('Resim yüklenemedi');
@@ -158,7 +178,7 @@ export default function JobFormClient({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,image/gif"
                 onChange={handleImageUpload}
                 style={{ display: 'none' }}
               />

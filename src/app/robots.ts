@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/', '/dashboard/', '/auth/'], // Prevent crawling of private/auth pages
+      disallow: ['/admin/', '/dashboard/', '/auth/'],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

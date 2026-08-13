@@ -1,6 +1,27 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
+import fs from 'fs';
+import path from 'path';
+
+// Yüklenen görseli diskten güvenli şekilde sil
+function deleteUploadedImage(imageUrl: string | null | undefined) {
+  if (!imageUrl || !imageUrl.startsWith('/uploads/')) return;
+  
+  try {
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    const filePath = path.join(process.cwd(), 'public', imageUrl);
+    
+    // Path traversal koruması
+    if (!filePath.startsWith(uploadDir)) return;
+    
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch (error) {
+    console.error('Eski görsel silinemedi:', error);
+  }
+}
 
 export async function getActiveJobs() {
   return prisma.job.findMany({
@@ -74,6 +95,17 @@ export async function updateJob(
     isFeatured?: boolean;
   }
 ) {
+  // Görsel değişiyorsa eski görseli diskten sil
+  if (data.imageUrl) {
+    const existingJob = await prisma.job.findUnique({
+      where: { id },
+      select: { imageUrl: true },
+    });
+    if (existingJob?.imageUrl && existingJob.imageUrl !== data.imageUrl) {
+      deleteUploadedImage(existingJob.imageUrl);
+    }
+  }
+
   return prisma.job.update({
     where: { id },
     data,
@@ -81,6 +113,15 @@ export async function updateJob(
 }
 
 export async function deleteJob(id: string) {
+  // İlan silinmeden önce görselini diskten sil
+  const job = await prisma.job.findUnique({
+    where: { id },
+    select: { imageUrl: true },
+  });
+  if (job?.imageUrl) {
+    deleteUploadedImage(job.imageUrl);
+  }
+
   return prisma.job.delete({
     where: { id },
   });

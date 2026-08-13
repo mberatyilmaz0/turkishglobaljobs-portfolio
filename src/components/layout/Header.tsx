@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { useSession, signOut } from 'next-auth/react';
 import { useState } from 'react';
+import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header() {
@@ -25,14 +26,14 @@ export default function Header() {
             justifyContent: 'center',
             boxShadow: '0 2px 6px rgba(0,0,0,0.08)'
           }}>
-            <img 
-              src="/img/turkishglobal.png" 
+            <Image 
+              src="/img/turkishglobal.webp" 
               alt="TurkishGlobal" 
+              width={76}
+              height={76}
+              priority
               style={{ 
-                width: '135%', 
-                height: '135%', 
                 objectFit: 'cover',
-                maxWidth: 'none'
               }} 
             />
           </div>
