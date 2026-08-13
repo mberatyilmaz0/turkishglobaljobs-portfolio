@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { useSession, signOut } from 'next-auth/react';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -10,8 +10,14 @@ import LanguageSwitcher from './LanguageSwitcher';
 export default function Header() {
   const t = useTranslations('common');
   const locale = useLocale();
+  const router = useRouter();
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    router.push('/');
+  };
 
   return (
     <header className="header">
@@ -65,7 +71,7 @@ export default function Header() {
               <Link href="/dashboard" className="nav-link" onClick={() => setMenuOpen(false)}>
                 {t('dashboard')}
               </Link>
-              <button className="logout-btn" onClick={() => signOut({ callbackUrl: `/${locale}` })}>
+              <button className="logout-btn" onClick={handleLogout}>
                 {t('logout')}
               </button>
             </>
