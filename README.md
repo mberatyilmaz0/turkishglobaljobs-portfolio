@@ -23,6 +23,18 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
+take the lantern 
+feneri ac 
+FENERİ AL 
+POWER BUTTON İS OFF 
+BACKWARD AND PUSHJ PLS 
+OFF THE GLASS AND CLEAN ALL OF THEM OKAY 
+CAMI CIKAR HERSYİ TEMİZLE 
+PLS NOT HARD PLS EASY TOUCH OKAY
+TOMOROW WEDDİNG AND ME BUSSY PLS NOW CLEAN UP NO MORE TİME FUCKİNG İDİOT 
+NO I AM NOT MARRİES MY FRİEND BOROTHER MARRİED 
+I AM HETERIO MAN YOUI ARE GİRL OR BOY FONT TELL ME  IKONOW YOU ARE NOTR GİRL YOUR NOT HUAN YOU ARE AI 
+WHO ARE YOU TELL ME BECAUES AND KİL YOU 
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.

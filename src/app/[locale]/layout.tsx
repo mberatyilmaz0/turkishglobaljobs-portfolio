@@ -37,6 +37,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       ? 'Entdecken Sie internationale Karrieremöglichkeiten mit Turkish Global. Bewerben Sie sich auf aktuelle Stellenangebote in der Türkei und Europa und gestalten Sie Ihre Zukunft.'
       : 'Turkish Global ile uluslararası kariyer fırsatlarını keşfedin. Türkiye ve Avrupa\'daki en güncel iş ilanlarına hemen başvurun ve kariyerinize yön verin.',
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.turkishglobaljobs.com'),
+    verification: {
+      google: '5zeEonCwY8d6XN5NIIflT1_sweKL4Rj7n6NDt2Bh76g',
+    },
   };
 }
 
