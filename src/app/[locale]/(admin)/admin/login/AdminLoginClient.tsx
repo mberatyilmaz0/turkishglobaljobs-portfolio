@@ -18,18 +18,30 @@ export default function AdminLoginClient() {
 
     const formData = new FormData(e.currentTarget);
 
-    const result = await signIn('credentials', {
-      email: formData.get('email'),
-      password: formData.get('password'),
-      redirect: false,
-    });
+    try {
+      const result = await signIn('credentials', {
+        email: formData.get('email'),
+        password: formData.get('password'),
+        redirect: false,
+      });
 
-    if (result?.error) {
-      setError(t('invalidCredentials'));
+      console.log('signIn result:', result);
+
+      if (result?.error) {
+        setError(t('invalidCredentials'));
+        setLoading(false);
+      } else if (result?.ok) {
+        router.push('/admin');
+        router.refresh();
+      } else {
+        // result beklenmedik bir formatta döndü
+        setError('Giriş başarısız. Lütfen tekrar deneyin.');
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error('signIn exception:', err);
+      setError('Sunucu hatası. Lütfen tekrar deneyin.');
       setLoading(false);
-    } else {
-      router.push('/admin');
-      router.refresh();
     }
   };
 
