@@ -1,13 +1,13 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useRouter } from '@/i18n/routing';
+
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 
 export default function AdminLoginClient() {
   const t = useTranslations('auth');
-  const router = useRouter();
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,10 +31,11 @@ export default function AdminLoginClient() {
         setError(t('invalidCredentials'));
         setLoading(false);
       } else if (result?.ok) {
-        router.push('/admin');
-        router.refresh();
+        // Hard navigation — cookie'nin tanınması için tam sayfa yüklemesi gerekli
+        // Mevcut locale'i URL'den al
+        const locale = window.location.pathname.match(/^\/(tr|de)/)?.[1] || 'tr';
+        window.location.href = `/${locale}/admin`;
       } else {
-        // result beklenmedik bir formatta döndü
         setError('Giriş başarısız. Lütfen tekrar deneyin.');
         setLoading(false);
       }
