@@ -21,6 +21,54 @@ function mapEmploymentType(type: string): string {
   return map[type] || 'FULL_TIME';
 }
 
+// Konum string'inden ülke kodu ve şehir bilgisi çıkar
+function parseJobLocation(location: string): { country: string; locality: string } {
+  const loc = location.toLowerCase().trim();
+
+  // Almanya şehirleri ve bölgeleri
+  const deCities = [
+    'berlin', 'münchen', 'munich', 'hamburg', 'köln', 'cologne', 'frankfurt',
+    'stuttgart', 'düsseldorf', 'dortmund', 'essen', 'leipzig', 'bremen',
+    'dresden', 'hannover', 'nürnberg', 'nuremberg', 'duisburg', 'bochum',
+    'wuppertal', 'bielefeld', 'bonn', 'münster', 'karlsruhe', 'mannheim',
+    'augsburg', 'wiesbaden', 'gelsenkirchen', 'aachen', 'kiel', 'freiburg',
+    'halle', 'magdeburg', 'oberhausen', 'lübeck', 'erfurt', 'rostock',
+    'mainz', 'kassel', 'saarbrücken', 'potsdam', 'heidelberg', 'darmstadt',
+    'regensburg', 'würzburg', 'wolfsburg', 'ulm', 'bamberg',
+    'deutschland', 'almanya', 'germany',
+    'nordrhein-westfalen', 'nrw', 'bayern', 'bavaria', 'baden-württemberg',
+    'niedersachsen', 'hessen', 'sachsen', 'rheinland-pfalz', 'schleswig-holstein',
+    'thüringen', 'brandenburg', 'mecklenburg-vorpommern', 'saarland',
+  ];
+
+  // Türkiye şehirleri
+  const trCities = [
+    'istanbul', 'ankara', 'izmir', 'bursa', 'antalya', 'adana', 'konya',
+    'gaziantep', 'mersin', 'kayseri', 'eskişehir', 'trabzon', 'samsun',
+    'denizli', 'sakarya', 'malatya', 'erzurum', 'van', 'batman',
+    'diyarbakır', 'şanlıurfa', 'elazığ', 'muğla', 'aydın', 'balıkesir',
+    'tekirdağ', 'manisa', 'kahramanmaraş', 'hatay', 'sivas',
+    'türkiye', 'turkey', 'tr',
+  ];
+
+  if (deCities.some(city => loc.includes(city))) {
+    return { country: 'DE', locality: location };
+  }
+  if (trCities.some(city => loc.includes(city))) {
+    return { country: 'TR', locality: location };
+  }
+
+  // Varsayılan: Almanya (proje Almanya'daki Türk iş ilanlarına odaklı)
+  return { country: 'DE', locality: location };
+}
+
+// validThrough hesapla: createdAt + 60 gün
+function calculateValidThrough(createdAt: Date): string {
+  const validDate = new Date(createdAt);
+  validDate.setDate(validDate.getDate() + 60);
+  return validDate.toISOString().split('T')[0];
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; id: string }> }): Promise<Metadata> {
   const { locale, id } = await params;
   const job = await getJobById(id);
@@ -74,34 +122,41 @@ export default async function JobDetailPage({
   const isDE = locale === 'de';
   const title = isDE ? (job.titleDe || job.title) : job.title;
   const description = isDE ? (job.descriptionDe || job.description) : job.description;
+  const { country, locality } = parseJobLocation(job.location);
 
-  const jsonLd = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const jsonLd: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'JobPosting',
-    title: title,
-    description: description,
+    title,
+    description,
     datePosted: job.createdAt.toISOString().split('T')[0],
+    validThrough: calculateValidThrough(job.createdAt),
     employmentType: mapEmploymentType(job.type),
-    jobLocation: {
-      '@type': 'Place',
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: job.location,
-        addressCountry: job.location.toLowerCase().includes('istanbul') || job.location.toLowerCase().includes('ankara') || job.location.toLowerCase().includes('izmir') ? 'TR' : 'TR',
-      },
-    },
     hiringOrganization: {
       '@type': 'Organization',
       name: 'Turkish Global',
       sameAs: BASE_URL,
       logo: `${BASE_URL}/img/turkishglobal.webp`,
     },
-    applicantLocationRequirements: job.type === 'Remote' ? {
-      '@type': 'Country',
-      name: 'Turkey',
-    } : undefined,
-    jobLocationType: job.type === 'Remote' ? 'TELECOMMUTE' : undefined,
+    jobLocation: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: locality,
+        addressCountry: country,
+      },
+    },
   };
+
+  // Remote ilanlar için ek alanlar
+  if (job.type === 'Remote') {
+    jsonLd.jobLocationType = 'TELECOMMUTE';
+    jsonLd.applicantLocationRequirements = {
+      '@type': 'Country',
+      name: country === 'DE' ? 'Germany' : 'Turkey',
+    };
+  }
 
   return (
     <>
@@ -113,3 +168,4 @@ export default async function JobDetailPage({
     </>
   );
 }
+
