@@ -41,3 +41,12 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# sensitive / tooling files
+temp_add_admins.js
+migrate.ts
+images.jfif
+.agents/
+graphify-out/
+AGENTS.md
+CLAUDE.md

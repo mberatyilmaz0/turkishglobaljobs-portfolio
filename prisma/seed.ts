@@ -10,13 +10,13 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   // Create admin users
-  const adminPassword = await bcrypt.hash('admin123', 12);
+  const adminPassword = await bcrypt.hash('changeme123', 12);
   
   await prisma.user.upsert({
-    where: { email: 'admin@kariyerportal.com' },
+    where: { email: 'admin@example.com' },
     update: {},
     create: {
-      email: 'admin@kariyerportal.com',
+      email: 'admin@example.com',
       password: adminPassword,
       firstName: 'Admin',
       lastName: 'User',
@@ -25,13 +25,13 @@ async function main() {
   });
 
   await prisma.user.upsert({
-    where: { email: 'admin2@kariyerportal.com' },
+    where: { email: 'admin2@example.com' },
     update: {},
     create: {
-      email: 'admin2@kariyerportal.com',
+      email: 'admin2@example.com',
       password: adminPassword,
       firstName: 'Admin',
-      lastName: 'İki',
+      lastName: 'Two',
       role: 'ADMIN',
     },
   });
@@ -111,8 +111,8 @@ async function main() {
   }
 
   console.log('Seed data created successfully!');
-  console.log('Admin login: admin@kariyerportal.com / admin123');
-  console.log('Admin 2 login: admin2@kariyerportal.com / admin123');
+  console.log('Admin login: admin@example.com / changeme123');
+  console.log('Admin 2 login: admin2@example.com / changeme123');
 }
 
 main()

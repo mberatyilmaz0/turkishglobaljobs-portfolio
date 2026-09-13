@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import JobDetailClient from './JobDetailClient';
 import { Metadata } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.turkishglobaljobs.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com';
 
 // Çalışma tipini schema.org formatına çevir
 function mapEmploymentType(type: string): string {

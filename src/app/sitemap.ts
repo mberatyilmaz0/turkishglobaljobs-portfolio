@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/prisma';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.isbasvurusitesi.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com';
 
   // Fetch all active jobs to generate dynamic sitemap entries
   const jobs = await prisma.job.findMany({

@@ -121,8 +121,8 @@ model SiteVisit {
 
 model SiteSettings {
   id        String   @id @default(cuid())
-  address   String   @default("Levent Mah. Büyükdere Cad. No: 123\\nŞişli, İstanbul 34330\\nTürkiye")
-  email     String   @default("info@kariyerportal.com, ik@kariyerportal.com")
-  phone     String   @default("+90 (212) 555 00 00, +90 (532) 555 00 00")
+  address   String   @default("Example Street, Example City\\nExample Country")
+  email     String   @default("info@example.com")
+  phone     String   @default("+90 (000) 000 00 00")
   updatedAt DateTime @updatedAt
 }

@@ -3,7 +3,7 @@ import { getFeaturedJobs } from '@/actions/jobs';
 import HomeClient from './HomeClient';
 import type { Metadata } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.turkishglobaljobs.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
