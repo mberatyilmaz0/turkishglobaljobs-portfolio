@@ -1,94 +1,264 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { Link, useRouter } from '@/i18n/routing';
-import { useSession, signOut } from 'next-auth/react';
-import { useState } from 'react';
+import { Link } from '@/i18n/routing';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header() {
   const t = useTranslations('common');
-  const locale = useLocale();
-  const router = useRouter();
-  const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push('/');
-  };
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const navLinks = [
+    { href: '/',                  labelKey: 'home' },
+    { href: '/jobs',              labelKey: 'germanyJobs' },
+    { href: '/opportunity-card',  labelKey: 'opportunityCard' },
+    { href: '/education',         labelKey: 'germanyEducation' },
+    { href: '/hakkimizda',        labelKey: 'aboutUs' },
+    { href: '/almanya-rehberi',   labelKey: 'germanyGuide' },
+  ] as const;
 
   return (
-    <header className="header">
-      <div className="header-inner">
-        <Link href="/" className="header-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            overflow: 'hidden',
+    <header
+      className="header"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        transition: 'background 0.3s ease, box-shadow 0.3s ease',
+        background: scrolled
+          ? 'rgba(10, 18, 40, 0.97)'
+          : 'rgba(10, 18, 40, 0.72)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        boxShadow: scrolled ? '0 4px 32px rgba(0,0,0,0.35)' : 'none',
+        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.07)' : 'none',
+      }}
+    >
+      <div
+        className="header-inner"
+        style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          padding: '0 24px',
+          height: '72px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '24px',
+        }}
+      >
+        {/* ─── Logo ─── */}
+        <Link
+          href="/"
+          style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.08)'
-          }}>
-            <Image 
-              src="/img/turkishglobal.webp" 
-              alt="TurkishGlobal" 
-              width={76}
-              height={76}
+            gap: '12px',
+            textDecoration: 'none',
+            flexShrink: 0,
+          }}
+        >
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              boxShadow: '0 2px 12px rgba(59,130,246,0.4)',
+              flexShrink: 0,
+            }}
+          >
+            <Image
+              src="/img/turkishglobal.webp"
+              alt="TurkishGlobal"
+              width={48}
+              height={48}
               priority
-              style={{ 
-                objectFit: 'cover',
-              }} 
+              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
             />
           </div>
-          <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>Turkish Global</span>
+          <span
+            style={{
+              fontSize: '1.1rem',
+              fontWeight: 700,
+              color: '#ffffff',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.2,
+            }}
+          >
+            Turkish<span style={{ color: '#60a5fa' }}>Global</span>
+          </span>
         </Link>
 
+        {/* ─── Mobile Hamburger ─── */}
         <button
           className="mobile-menu-btn"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Menu"
+          style={{
+            display: 'none',
+            background: 'none',
+            border: 'none',
+            color: '#fff',
+            fontSize: '1.5rem',
+            cursor: 'pointer',
+          }}
         >
           {menuOpen ? '✕' : '☰'}
         </button>
 
-        <nav className={`header-nav ${menuOpen ? 'open' : ''}`}>
-          <Link href="/" className="nav-link" onClick={() => setMenuOpen(false)}>
-            {t('home')}
-          </Link>
-          <Link href="/jobs" className="nav-link" onClick={() => setMenuOpen(false)}>
-            {t('jobs')}
-          </Link>
-          <Link href="/contact" className="nav-link" onClick={() => setMenuOpen(false)}>
-            {t('contact')}
-          </Link>
-
-          {session?.user ? (
-            <>
-              <Link href="/dashboard" className="nav-link" onClick={() => setMenuOpen(false)}>
-                {t('dashboard')}
-              </Link>
-              <button className="logout-btn" onClick={handleLogout}>
-                {t('logout')}
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/auth/login" className="nav-link" onClick={() => setMenuOpen(false)}>
-                {t('login')}
-              </Link>
-              <Link href="/auth/register" className="btn btn-primary btn-sm" style={{borderRadius: '100px'}} onClick={() => setMenuOpen(false)}>
-                {t('register')}
-              </Link>
-            </>
-          )}
-
-          <LanguageSwitcher />
+        {/* ─── Nav Links ─── */}
+        <nav
+          className={`header-nav ${menuOpen ? 'open' : ''}`}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            flex: 1,
+            justifyContent: 'center',
+          }}
+        >
+          {navLinks.map(({ href, labelKey }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.82)',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+                transition: 'color 0.2s, background 0.2s',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.color = '#ffffff';
+                (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.82)';
+                (e.currentTarget as HTMLElement).style.background = 'transparent';
+              }}
+            >
+              {t(labelKey)}
+            </Link>
+          ))}
         </nav>
+
+        {/* ─── Right Side: Lang Switcher + CTA ─── */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            flexShrink: 0,
+          }}
+        >
+          <LanguageSwitcher />
+
+          <Link
+            href="/pre-application"
+            onClick={() => setMenuOpen(false)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: '#ffffff',
+              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              padding: '10px 20px',
+              borderRadius: '10px',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 14px rgba(37,99,235,0.45)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+              (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 20px rgba(37,99,235,0.6)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+              (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 14px rgba(37,99,235,0.45)';
+            }}
+          >
+            {t('ctaContact')}
+          </Link>
+        </div>
       </div>
+
+      {/* ─── Mobile Overlay Nav ─── */}
+      {menuOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '72px',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(10,18,40,0.98)',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '32px 24px',
+            gap: '8px',
+            overflowY: 'auto',
+          }}
+        >
+          {navLinks.map(({ href, labelKey }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                fontSize: '1.1rem',
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.85)',
+                padding: '14px 16px',
+                borderRadius: '10px',
+                textDecoration: 'none',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+                transition: 'background 0.2s',
+              }}
+            >
+              {t(labelKey)}
+            </Link>
+          ))}
+          <Link
+            href="/pre-application"
+            onClick={() => setMenuOpen(false)}
+            style={{
+              marginTop: '16px',
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: '#ffffff',
+              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              padding: '16px 24px',
+              borderRadius: '12px',
+              textDecoration: 'none',
+              textAlign: 'center',
+            }}
+          >
+            {t('ctaContact')}
+          </Link>
+          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+            <LanguageSwitcher />
+          </div>
+        </div>
+      )}
     </header>
   );
 }

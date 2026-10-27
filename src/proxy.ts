@@ -7,11 +7,41 @@ import { routing } from './i18n/routing';
 // next-intl locale handling
 const intlMiddleware = createMiddleware(routing);
 
+// Eski İngilizce adresler için 301 kalıcı yönlendirmeler (locale bazlı)
+const permanentRedirects: Record<string, string> = {
+  '/tr/jobs': '/tr/almanya-is',
+  '/tr/opportunity-card': '/tr/firsat-karti',
+  '/tr/education': '/tr/almanya-egitim',
+  '/tr/pre-application': '/tr/on-basvuru',
+  '/de/jobs': '/de/arbeit-in-deutschland',
+  '/de/opportunity-card': '/de/chancenkarte',
+  '/de/education': '/de/bildung-in-deutschland',
+  '/de/pre-application': '/de/vorab-bewerbung',
+};
+const dynamicJobRegex = /^\/(tr|de)\/jobs\/(.+)$/;
+
 // Admin route'larına erişimi proxy katmanında kontrol eden fonksiyon.
 // Bu, server action'lardaki mevcut session/role kontrollerini KALDIRMAZ —
 // defense in depth prensibiyle ek bir güvenlik katmanı olarak çalışır.
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const normalizedPath = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+
+  // 1) 301 Kalıcı Yönlendirme Kontrolü (next-intl 307 yerine 301 kalıcı yönlendirme sağlar)
+  if (permanentRedirects[normalizedPath]) {
+    const targetUrl = request.nextUrl.clone();
+    targetUrl.pathname = permanentRedirects[normalizedPath];
+    return NextResponse.redirect(targetUrl, 301);
+  }
+
+  const jobMatch = normalizedPath.match(dynamicJobRegex);
+  if (jobMatch) {
+    const [, locale, id] = jobMatch;
+    const targetPrefix = locale === 'de' ? '/de/arbeit-in-deutschland' : '/tr/almanya-is';
+    const targetUrl = request.nextUrl.clone();
+    targetUrl.pathname = `${targetPrefix}/${id}`;
+    return NextResponse.redirect(targetUrl, 301);
+  }
 
   // Admin route'larını kontrol et: /(tr|de)/admin/... pattern'ini yakala
   // Login sayfasını muaf tut — aksi halde giriş yapılamaz

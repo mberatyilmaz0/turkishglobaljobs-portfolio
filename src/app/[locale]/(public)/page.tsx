@@ -1,5 +1,4 @@
 import { setRequestLocale } from 'next-intl/server';
-import { getFeaturedJobs } from '@/actions/jobs';
 import HomeClient from './HomeClient';
 import type { Metadata } from 'next';
 
@@ -10,9 +9,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const isDE = locale === 'de';
 
   return {
+    title: isDE
+      ? 'Turkish Global – Ihr Weg nach Deutschland | Beratung & Chancenkarte'
+      : 'Turkish Global – Almanya\'da Yeni Hayatınız | Danışmanlık & Fırsat Kartı',
     description: isDE
-      ? 'Entdecken Sie aktuelle internationale Stellenangebote bei Turkish Global. Karrieremöglichkeiten in der Türkei und Europa – bewerben Sie sich jetzt auf passende Positionen.'
-      : 'Turkish Global ile uluslararası kariyer fırsatlarını keşfedin. Türkiye ve Avrupa\'daki en güncel iş ilanlarına göz atın, profilinizi oluşturun ve hemen başvurun.',
+      ? 'Wir begleiten Sie bei Blue Card, Chancenkarte und beruflicher Anerkennung. Professionelle Beratung für Ihren Neustart in Deutschland.'
+      : 'Mavi Kart, Fırsat Kartı ve Mesleki Denklik süreçlerinizde uzman ekibimizle yanınızdayız. Almanya\'da yeni hayatınıza ilk adımı atın.',
     alternates: {
       canonical: `${BASE_URL}/${locale}`,
       languages: {
@@ -27,7 +29,5 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const jobs = await getFeaturedJobs();
-
-  return <HomeClient jobs={jobs} />;
+  return <HomeClient />;
 }
