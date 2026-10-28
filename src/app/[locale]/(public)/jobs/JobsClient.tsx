@@ -112,7 +112,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
 
   const sectors     = useMemo(() => [...new Set(initialJobs.map(j => j.sector))].filter(Boolean).sort(),  [initialJobs]);
   const types       = useMemo(() => [...new Set(initialJobs.map(j => j.type))].filter(Boolean).sort(),    [initialJobs]);
-  const locations   = useMemo(() => [...new Set(initialJobs.map(j => j.location))].filter(Boolean).sort(),[initialJobs]);
+
   const experiences = useMemo(() => [...new Set(initialJobs.map(j => j.experienceLevel))].filter(Boolean).sort() as string[], [initialJobs]);
 
   const filteredJobs = useMemo(() => {

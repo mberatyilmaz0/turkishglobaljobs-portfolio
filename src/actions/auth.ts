@@ -5,6 +5,11 @@ import { prisma } from '@/lib/prisma';
 import { signIn, signOut } from '@/lib/auth';
 import { registerSchema } from '@/lib/validations';
 
+function isDbAvailable(): boolean {
+  const url = process.env.DATABASE_URL || '';
+  return url.startsWith('postgresql://') || url.startsWith('postgres://');
+}
+
 export async function registerUser(formData: FormData) {
   const rawData = {
     firstName: formData.get('firstName') as string,
@@ -22,6 +27,8 @@ export async function registerUser(formData: FormData) {
 
   const { firstName, lastName, email, password } = validation.data;
 
+  if (!isDbAvailable()) return { error: 'Veritabanı bağlantısı yok. Kayıt yapılamıyor.' };
+
   const existingUser = await prisma.user.findUnique({
     where: { email },
   });
@@ -32,16 +39,19 @@ export async function registerUser(formData: FormData) {
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  await prisma.user.create({
-    data: {
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-    },
-  });
-
-  return { success: true };
+  try {
+    await prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+      },
+    });
+    return { success: true };
+  } catch {
+    return { error: 'Kayıt sırasında bir hata oluştu.' };
+  }
 }
 
 export async function loginUser(formData: FormData) {

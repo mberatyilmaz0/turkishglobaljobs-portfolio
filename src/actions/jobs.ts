@@ -1,62 +1,61 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import fs from 'fs';
-import path from 'path';
 
-// Yüklenen görseli diskten güvenli şekilde sil
-function deleteUploadedImage(imageUrl: string | null | undefined) {
-  if (!imageUrl || !imageUrl.startsWith('/uploads/')) return;
-  
+export async function getActiveJobs() {
   try {
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    const filePath = path.join(process.cwd(), 'public', imageUrl);
-    
-    // Path traversal koruması
-    if (!filePath.startsWith(uploadDir)) return;
-    
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    return await prisma.job.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: 'desc' },
+    });
   } catch (error) {
-    console.error('Eski görsel silinemedi:', error);
+    console.error('Aktif ilanlar çekilirken hata:', error);
+    return [];
   }
 }
 
-export async function getActiveJobs() {
-  return prisma.job.findMany({
-    where: { isActive: true },
-    orderBy: { createdAt: 'desc' },
-  });
-}
-
 export async function getFeaturedJobs() {
-  return prisma.job.findMany({
-    where: { isFeatured: true },
-    orderBy: { createdAt: 'desc' },
-  });
+  try {
+    return await prisma.job.findMany({
+      where: { isFeatured: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  } catch (error) {
+    console.error('Öne çıkan ilanlar çekilirken hata:', error);
+    return [];
+  }
 }
 
 export async function getJobById(id: string) {
-  return prisma.job.findUnique({
-    where: { id },
-    include: {
-      _count: {
-        select: { applications: true },
+  try {
+    return await prisma.job.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: { applications: true },
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error('İlan detayı çekilirken hata:', error);
+    return null;
+  }
 }
 
 export async function getAllJobs() {
-  return prisma.job.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      _count: {
-        select: { applications: true },
+  try {
+    return await prisma.job.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: {
+          select: { applications: true },
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error('Tüm ilanlar çekilirken hata:', error);
+    return [];
+  }
 }
 
 export async function createJob(data: {
@@ -70,11 +69,13 @@ export async function createJob(data: {
   descriptionDe: string;
   shortDesc: string;
   shortDescDe: string;
-  imageUrl?: string;
   isActive: boolean;
   isFeatured?: boolean;
+  salaryMin?: number;
+  salaryMax?: number;
+  langLevel?: string;
 }) {
-  return prisma.job.create({ data });
+  return await prisma.job.create({ data });
 }
 
 export async function updateJob(
@@ -90,39 +91,21 @@ export async function updateJob(
     descriptionDe?: string;
     shortDesc?: string;
     shortDescDe?: string;
-    imageUrl?: string;
     isActive?: boolean;
     isFeatured?: boolean;
+    salaryMin?: number | null;
+    salaryMax?: number | null;
+    langLevel?: string | null;
   }
 ) {
-  // Görsel değişiyorsa eski görseli diskten sil
-  if (data.imageUrl) {
-    const existingJob = await prisma.job.findUnique({
-      where: { id },
-      select: { imageUrl: true },
-    });
-    if (existingJob?.imageUrl && existingJob.imageUrl !== data.imageUrl) {
-      deleteUploadedImage(existingJob.imageUrl);
-    }
-  }
-
-  return prisma.job.update({
+  return await prisma.job.update({
     where: { id },
     data,
   });
 }
 
 export async function deleteJob(id: string) {
-  // İlan silinmeden önce görselini diskten sil
-  const job = await prisma.job.findUnique({
-    where: { id },
-    select: { imageUrl: true },
-  });
-  if (job?.imageUrl) {
-    deleteUploadedImage(job.imageUrl);
-  }
-
-  return prisma.job.delete({
+  return await prisma.job.delete({
     where: { id },
   });
 }

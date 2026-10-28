@@ -14,7 +14,6 @@ export default function ApplicationsListClient({
   applications: any[];
   locale: string;
 }) {
-  const t = useTranslations('admin');
   const ts = useTranslations('status');
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');

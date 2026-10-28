@@ -1,9 +1,9 @@
 'use client';
-
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 
 export default function AdminDashboardClient({
   stats,
@@ -16,7 +16,6 @@ export default function AdminDashboardClient({
   recentJobs: any[];
   locale: string;
 }) {
-  const t = useTranslations('admin');
   const ts = useTranslations('status');
 
   return (

@@ -1,13 +1,11 @@
 import { setRequestLocale } from 'next-intl/server';
 import { getActiveJobs } from '@/actions/jobs';
 import JobsClient from './JobsClient';
-import { getTranslations } from 'next-intl/server';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'jobs' });
   const isDE = locale === 'de';
 
   return {

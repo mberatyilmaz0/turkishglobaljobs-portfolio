@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -53,8 +53,8 @@ const errStyle: React.CSSProperties = {
 export default function OnBasvuruPage() {
   const t  = useTranslations('application');
   const tc = useTranslations('common');
-  const locale = useLocale();
   const [submitted, setSubmitted] = useState(false);
+  const [apiError, setApiError]   = useState<string | null>(null);
 
   const {
     register,
@@ -63,10 +63,28 @@ export default function OnBasvuruPage() {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    // Simulate async send (replace with API call later)
-    await new Promise(r => setTimeout(r, 900));
-    console.log('Ön Başvuru:', data);
-    setSubmitted(true);
+    setApiError(null);
+    try {
+      const res = await fetch('/api/send-mail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ad:              data.firstName,
+          soyad:           data.lastName,
+          eposta:          data.email,
+          telefon:         data.phone,
+          amac:            data.purpose,
+          egitimDurumu:    data.education,
+          almancaSeviyesi: data.germanLevel,
+          not:             data.note ?? '',
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error ?? 'Bilinmeyen hata');
+      setSubmitted(true);
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : 'Mail gönderilemedi. Lütfen tekrar deneyin.');
+    }
   };
 
   /* ─── Success Screen ─── */
@@ -264,7 +282,7 @@ export default function OnBasvuruPage() {
                       value={p}
                       style={{ accentColor: '#2563eb', width: '16px', height: '16px', flexShrink: 0 }}
                     />
-                    {t(`purpose_${p}` as any)}
+                    {t(`purpose_${p}` as `purpose_${typeof PURPOSES[number]}`)}
                   </label>
                 ))}
               </div>
@@ -284,7 +302,7 @@ export default function OnBasvuruPage() {
               >
                 <option value="">{t('selectPlaceholder')}</option>
                 {EDUCATIONS.map(e => (
-                  <option key={e} value={e}>{t(`edu_${e}` as any)}</option>
+                  <option key={e} value={e}>{t(`edu_${e}` as `edu_${typeof EDUCATIONS[number]}`)}</option>
                 ))}
               </select>
               {errors.education && <span style={errStyle}>{errors.education.message}</span>}
@@ -391,6 +409,23 @@ export default function OnBasvuruPage() {
             <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.78rem', marginTop: '16px' }}>
               🔒 {t('privacyNote')}
             </p>
+
+            {/* ─ API Hata Mesajı ─ */}
+            {apiError && (
+              <div style={{
+                marginTop: '16px',
+                padding: '14px 18px',
+                borderRadius: '12px',
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                color: '#b91c1c',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                textAlign: 'center',
+              }}>
+                ⚠️ {apiError}
+              </div>
+            )}
           </form>
         </div>
       </div>

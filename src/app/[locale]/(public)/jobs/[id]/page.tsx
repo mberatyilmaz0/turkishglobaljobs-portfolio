@@ -1,6 +1,5 @@
 import { setRequestLocale } from 'next-intl/server';
 import { getJobById } from '@/actions/jobs';
-import { hasApplied } from '@/actions/applications';
 import { notFound } from 'next/navigation';
 import JobDetailClient from './JobDetailClient';
 import { Metadata } from 'next';
@@ -112,11 +111,9 @@ export default async function JobDetailPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  let job = await getJobById(id);
+  const job = await getJobById(id);
 
   if (!job) notFound();
-
-  const applied = await hasApplied(id);
 
   // JobPosting JSON-LD yapısal veri
   const isDE = locale === 'de';
@@ -164,8 +161,7 @@ export default async function JobDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <JobDetailClient job={job} locale={locale} applied={applied} />
+      <JobDetailClient job={job} locale={locale} applied={false} />
     </>
   );
 }
-

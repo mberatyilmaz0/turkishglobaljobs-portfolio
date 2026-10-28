@@ -1,93 +1,42 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { createJob, updateJob } from '@/actions/jobs';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import type { Job } from '@prisma/client';
 
-const getJobImage = (title: string) => {
-  const t = title.toLowerCase();
-  if (t.includes('yazılım') || t.includes('software')) return '/img/yazilimci.jpg';
-  if (t.includes('grafik') || t.includes('design')) return '/img/grafik-tasarim-uzmani.webp';
-  if (t.includes('müşteri') || t.includes('kunden')) return '/img/musteriiliskileri.webp';
-  if (t.includes('pazarlama') || t.includes('marketing')) return '/img/dijitalpazarlama.jpeg';
-  if (t.includes('resepsiyon') || t.includes('rezeptionist')) return '/img/otelresepsiyon.jpg';
-  if (t.includes('muhasebe') || t.includes('buchhaltung')) return '/img/muhasebeuzmanı.webp';
-  return null;
-};
+const LANGUAGE_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Gerekmiyor'];
 
 export default function JobFormClient({
-  locale,
   job,
 }: {
   locale: string;
   job?: Job | null;
 }) {
-  const t = useTranslations('admin');
-  const tc = useTranslations('common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState('');
-  const fallbackImage = job ? (job.imageUrl || getJobImage(job.title)) : null;
-  const [imagePreview, setImagePreview] = useState<string | null>(fallbackImage);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>(job?.imageUrl || '');
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Client-side dosya boyutu kontrolü (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      setToast('Dosya boyutu 10MB\'ı aşamaz!');
-      setTimeout(() => setToast(''), 4000);
-      e.target.value = '';
-      return;
-    }
-
-    // Client-side MIME type kontrolü
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowedTypes.includes(file.type)) {
-      setToast('Sadece JPG, PNG, WebP ve GIF dosyaları kabul edilir!');
-      setTimeout(() => setToast(''), 4000);
-      e.target.value = '';
-      return;
-    }
-
-    // Önizleme
-    const reader = new FileReader();
-    reader.onload = (ev) => setImagePreview(ev.target?.result as string);
-    reader.readAsDataURL(file);
-
-    // Yükle
-    setUploading(true);
-    const fd = new FormData();
-    fd.append('file', file);
-
-    try {
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (data.url) {
-        setUploadedImageUrl(data.url);
-      } else if (data.error) {
-        setToast(data.error);
-        setTimeout(() => setToast(''), 4000);
-      }
-    } catch {
-      setToast('Resim yüklenemedi');
-      setTimeout(() => setToast(''), 3000);
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     const fd = new FormData(e.currentTarget);
+
+    const salaryMinRaw = fd.get('salaryMin') as string;
+    const salaryMaxRaw = fd.get('salaryMax') as string;
+    const salaryMin = salaryMinRaw ? parseInt(salaryMinRaw, 10) : undefined;
+    const salaryMax = salaryMaxRaw ? parseInt(salaryMaxRaw, 10) : undefined;
+
+    if (salaryMin !== undefined && salaryMax !== undefined && salaryMin > salaryMax) {
+      setToast('Min maaş, max maaştan büyük olamaz!');
+      setTimeout(() => setToast(''), 4000);
+      setLoading(false);
+      return;
+    }
+
+    const langLevelRaw = fd.get('langLevel') as string;
+
     const data = {
       title: fd.get('title') as string,
       titleDe: fd.get('titleDe') as string,
@@ -99,13 +48,20 @@ export default function JobFormClient({
       descriptionDe: fd.get('descriptionDe') as string,
       shortDesc: fd.get('shortDesc') as string,
       shortDescDe: fd.get('shortDescDe') as string,
-      imageUrl: uploadedImageUrl || undefined,
       isActive: fd.get('isActive') === 'true',
       isFeatured: fd.get('isFeatured') === 'true',
+      salaryMin: salaryMin || undefined,
+      salaryMax: salaryMax || undefined,
+      langLevel: langLevelRaw || undefined,
     };
 
     if (job) {
-      await updateJob(job.id, data);
+      await updateJob(job.id, {
+        ...data,
+        salaryMin: salaryMin ?? null,
+        salaryMax: salaryMax ?? null,
+        langLevel: langLevelRaw || null,
+      });
     } else {
       await createJob(data);
     }
@@ -128,61 +84,6 @@ export default function JobFormClient({
       <div className="ap-card">
         <div className="ap-card-body">
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-            {/* Resim Yükleme Alanı */}
-            <div className="form-group">
-              <label className="form-label">İlan Görseli</label>
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                style={{
-                  border: '2px dashed #cbd5e1',
-                  borderRadius: 12,
-                  padding: imagePreview ? 0 : 40,
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  background: '#f8fafc',
-                  transition: 'border-color 0.2s',
-                  overflow: 'hidden',
-                  position: 'relative',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#3b82f6')}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#cbd5e1')}
-              >
-                {imagePreview ? (
-                  <div style={{ position: 'relative' }}>
-                    <img
-                      src={imagePreview}
-                      alt="Önizleme"
-                      style={{ width: '100%', maxHeight: 220, objectFit: 'cover', display: 'block' }}
-                    />
-                    <div style={{
-                      position: 'absolute', bottom: 0, left: 0, right: 0,
-                      background: 'linear-gradient(transparent, rgba(0,0,0,0.6))',
-                      color: '#fff', padding: '20px 16px 12px', fontSize: '0.85rem',
-                    }}>
-                      {uploading ? '⏳ Yükleniyor...' : '📷 Değiştirmek için tıklayın'}
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <div style={{ fontSize: '2rem', marginBottom: 8 }}>📷</div>
-                    <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 500 }}>
-                      {uploading ? 'Yükleniyor...' : 'Resim yüklemek için tıklayın'}
-                    </div>
-                    <div style={{ color: '#94a3b8', fontSize: '0.78rem', marginTop: 4 }}>
-                      JPG, PNG veya WEBP
-                    </div>
-                  </div>
-                )}
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={handleImageUpload}
-                style={{ display: 'none' }}
-              />
-            </div>
 
             <div className="form-row">
               <div className="form-group">
@@ -254,6 +155,41 @@ export default function JobFormClient({
               </div>
             </div>
 
+            {/* Maaş ve Dil Seviyesi */}
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Min Maaş (€)</label>
+                <input
+                  name="salaryMin"
+                  type="number"
+                  min={0}
+                  className="form-input"
+                  defaultValue={job?.salaryMin ?? ''}
+                  placeholder="Örn: 2200"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Max Maaş (€)</label>
+                <input
+                  name="salaryMax"
+                  type="number"
+                  min={0}
+                  className="form-input"
+                  defaultValue={job?.salaryMax ?? ''}
+                  placeholder="Örn: 3500"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Dil Seviyesi</label>
+                <select name="langLevel" className="form-select" defaultValue={job?.langLevel || ''}>
+                  <option value="">Belirtilmemiş</option>
+                  {LANGUAGE_LEVELS.map((lvl) => (
+                    <option key={lvl} value={lvl}>{lvl}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Kısa Açıklama (TR)</label>
@@ -286,7 +222,7 @@ export default function JobFormClient({
               </label>
             </div>
 
-            <button type="submit" className="btn btn-primary" disabled={loading || uploading} style={{ alignSelf: 'flex-start' }}>
+            <button type="submit" className="btn btn-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
               {loading ? 'Kaydediliyor...' : 'Kaydet'}
             </button>
           </form>

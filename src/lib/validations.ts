@@ -42,18 +42,31 @@ export const educationSchema = z.object({
   current: z.boolean().default(false),
 });
 
-export const jobSchema = z.object({
-  title: z.string().min(1, 'requiredField'),
-  titleDe: z.string().min(1, 'requiredField'),
-  sector: z.string().min(1, 'requiredField'),
-  location: z.string().min(1, 'requiredField'),
-  type: z.string().min(1, 'requiredField'),
-  description: z.string().min(1, 'requiredField'),
-  descriptionDe: z.string().min(1, 'requiredField'),
-  shortDesc: z.string().min(1, 'requiredField'),
-  shortDescDe: z.string().min(1, 'requiredField'),
-  isActive: z.boolean().default(true),
-});
+export const jobSchema = z
+  .object({
+    title: z.string().min(1, 'requiredField'),
+    titleDe: z.string().min(1, 'requiredField'),
+    sector: z.string().min(1, 'requiredField'),
+    location: z.string().min(1, 'requiredField'),
+    type: z.string().min(1, 'requiredField'),
+    description: z.string().min(1, 'requiredField'),
+    descriptionDe: z.string().min(1, 'requiredField'),
+    shortDesc: z.string().min(1, 'requiredField'),
+    shortDescDe: z.string().min(1, 'requiredField'),
+    isActive: z.boolean().default(true),
+    salaryMin: z.number().int().positive().optional(),
+    salaryMax: z.number().int().positive().optional(),
+    langLevel: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.salaryMin !== undefined && data.salaryMax !== undefined) {
+        return data.salaryMin <= data.salaryMax;
+      }
+      return true;
+    },
+    { message: 'salaryMinExceedsMax', path: ['salaryMax'] }
+  );
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;

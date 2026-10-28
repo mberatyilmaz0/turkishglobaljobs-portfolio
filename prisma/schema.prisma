@@ -74,25 +74,29 @@ model Language {
 }
 
 model Job {
-  id            String   @id @default(cuid())
-  title         String
-  titleDe       String
-  sector        String
-  location      String
-  type          String
+  id              String   @id @default(cuid())
+  title           String
+  titleDe         String
+  sector          String
+  location        String
+  type            String
   experienceLevel String?
-  description   String
-  descriptionDe String
-  shortDesc     String
-  shortDescDe   String
-  imageUrl      String?
-  isActive      Boolean  @default(true)
-  isFeatured    Boolean  @default(false)
+  salaryRange     String?  // Örn: "2.200 - 3.500 €"
+  languageLevel   String?  // Örn: "Almanca B1+"
+  salaryMin       Int?     // Yeni: min maaş (€)
+  salaryMax       Int?     // Yeni: max maaş (€)
+  langLevel       String?  // Yeni: A1/A2/B1/B2/C1/C2 veya "Gerekmiyor"
+  description     String
+  descriptionDe   String
+  shortDesc       String
+  shortDescDe     String
+  isActive        Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
 
-  applications  Application[]
+  applications    Application[]
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Application {

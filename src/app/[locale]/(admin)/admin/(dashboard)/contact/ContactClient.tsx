@@ -46,7 +46,7 @@ export default function ContactClient({
                 required 
               />
               <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: 4 }}>
-                Satır başı yapmak için Enter'a basabilirsiniz.
+                Satır başı yapmak için Enter&apos;a basabilirsiniz.
               </p>
             </div>
 

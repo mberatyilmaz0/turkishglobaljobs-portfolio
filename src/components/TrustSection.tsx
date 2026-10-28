@@ -113,10 +113,10 @@ export default function TrustSection() {
                   fontSize: '1rem', fontWeight: 700, color: '#0f172a',
                   marginBottom: '10px', lineHeight: 1.3,
                 }}>
-                  {t(`step${i + 1}Title` as any)}
+                  {t(`step${i + 1}Title` as `step${1 | 2 | 3 | 4}Title`)}
                 </h3>
                 <p style={{ color: '#64748b', lineHeight: 1.65, fontSize: '0.9rem' }}>
-                  {t(`step${i + 1}Desc` as any)}
+                  {t(`step${i + 1}Desc` as `step${1 | 2 | 3 | 4}Desc`)}
                 </p>
               </div>
             ))}
@@ -198,7 +198,7 @@ export default function TrustSection() {
                   {value}
                 </div>
                 <div style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>
-                  {t(`metric${i + 1}` as any)}
+                  {t(`metric${i + 1}` as `metric${1 | 2 | 3 | 4}`)}
                 </div>
               </div>
             ))}
@@ -271,7 +271,7 @@ export default function TrustSection() {
                       color: isOpen ? '#1d4ed8' : '#0f172a',
                       lineHeight: 1.4,
                     }}>
-                      {t(`faq${i + 1}Q` as any)}
+                      {t(`faq${i + 1}Q` as `faq${1 | 2 | 3 | 4 | 5}Q`)}
                     </span>
                     <span style={{
                       flexShrink: 0,
@@ -300,7 +300,7 @@ export default function TrustSection() {
                       fontSize: '0.925rem',
                       margin: 0,
                     }}>
-                      {t(`faq${i + 1}A` as any)}
+                      {t(`faq${i + 1}A` as `faq${1 | 2 | 3 | 4 | 5}A`)}
                     </p>
                   </div>
                 </div>

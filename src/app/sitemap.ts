@@ -5,10 +5,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com';
 
   // Fetch all active jobs to generate dynamic sitemap entries
-  const jobs = await prisma.job.findMany({
-    where: { isActive: true },
-    select: { id: true, updatedAt: true },
-  });
+  // Wrapped in try/catch so build doesn't fail when DB is unavailable (CI/CD)
+  let jobs: { id: string; updatedAt: Date }[] = [];
+  try {
+    jobs = await prisma.job.findMany({
+      where: { isActive: true },
+      select: { id: true, updatedAt: true },
+    });
+  } catch {
+    // DB not reachable at build time — return static routes only
+  }
 
   const trJobEntries: MetadataRoute.Sitemap = jobs.map((job) => ({
     url: `${baseUrl}/tr/jobs/${job.id}`,
