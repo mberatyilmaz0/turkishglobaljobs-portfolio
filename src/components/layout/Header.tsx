@@ -28,7 +28,6 @@ export default function Header() {
 
   return (
     <header
-      className="header"
       style={{
         position: 'fixed',
         top: 0,
@@ -36,9 +35,7 @@ export default function Header() {
         right: 0,
         zIndex: 1000,
         transition: 'background 0.3s ease, box-shadow 0.3s ease',
-        background: scrolled
-          ? 'rgba(10, 18, 40, 0.97)'
-          : 'rgba(10, 18, 40, 0.72)',
+        background: scrolled ? 'rgba(10, 18, 40, 0.97)' : 'rgba(10, 18, 40, 0.72)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         boxShadow: scrolled ? '0 4px 32px rgba(0,0,0,0.35)' : 'none',
@@ -46,16 +43,15 @@ export default function Header() {
       }}
     >
       <div
-        className="header-inner"
         style={{
           maxWidth: '1280px',
           margin: '0 auto',
-          padding: '0 24px',
+          padding: '0 16px',
           height: '72px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '24px',
+          gap: '8px',
         }}
       >
         {/* ─── Logo ─── */}
@@ -64,15 +60,15 @@ export default function Header() {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            gap: '8px',
             textDecoration: 'none',
             flexShrink: 0,
           }}
         >
           <div
             style={{
-              width: '48px',
-              height: '48px',
+              width: '40px',
+              height: '40px',
               borderRadius: '50%',
               overflow: 'hidden',
               boxShadow: '0 2px 12px rgba(59,130,246,0.4)',
@@ -82,63 +78,28 @@ export default function Header() {
             <Image
               src="/img/turkishglobal.webp"
               alt="TurkishGlobal"
-              width={48}
-              height={48}
+              width={40}
+              height={40}
               priority
               style={{ objectFit: 'cover', width: '100%', height: '100%' }}
             />
           </div>
-          <span
-            style={{
-              fontSize: '1.1rem',
-              fontWeight: 700,
-              color: '#ffffff',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.2,
-            }}
-          >
+          <span className="hdr-logo-text">
             Turkish<span style={{ color: '#60a5fa' }}>Global</span>
           </span>
         </Link>
 
-        {/* ─── Mobile Hamburger ─── */}
-        <button
-          className="mobile-menu-btn"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Menu"
-          style={{
-            display: 'none',
-            background: 'none',
-            border: 'none',
-            color: '#fff',
-            fontSize: '1.5rem',
-            cursor: 'pointer',
-          }}
-        >
-          {menuOpen ? '✕' : '☰'}
-        </button>
-
-        {/* ─── Nav Links ─── */}
-        <nav
-          className={`header-nav ${menuOpen ? 'open' : ''}`}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            flex: 1,
-            justifyContent: 'center',
-          }}
-        >
+        {/* ─── Desktop Nav (≥1024px) ─── */}
+        <nav className="hdr-desktop-nav">
           {navLinks.map(({ href, labelKey }) => (
             <Link
               key={href}
               href={href}
-              onClick={() => setMenuOpen(false)}
               style={{
-                fontSize: '0.875rem',
+                fontSize: '0.82rem',
                 fontWeight: 500,
                 color: 'rgba(255,255,255,0.82)',
-                padding: '6px 12px',
+                padding: '6px 10px',
                 borderRadius: '8px',
                 textDecoration: 'none',
                 whiteSpace: 'nowrap',
@@ -158,29 +119,20 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* ─── Right Side: Lang Switcher + CTA ─── */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            flexShrink: 0,
-          }}
-        >
+        {/* ─── Desktop Right: Lang + CTA (≥1024px) ─── */}
+        <div className="hdr-desktop-right">
           <LanguageSwitcher />
-
           <Link
             href="/pre-application"
-            onClick={() => setMenuOpen(false)}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              fontSize: '0.875rem',
+              fontSize: '0.8rem',
               fontWeight: 600,
               color: '#ffffff',
               background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-              padding: '10px 20px',
+              padding: '9px 16px',
               borderRadius: '10px',
               textDecoration: 'none',
               whiteSpace: 'nowrap',
@@ -199,9 +151,35 @@ export default function Header() {
             {t('ctaContact')}
           </Link>
         </div>
+
+        {/* ─── Mobile Right: Flags + Hamburger (<1024px) ─── */}
+        <div className="hdr-mobile-right">
+          <LanguageSwitcher />
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? 'Menüyü kapat' : 'Menüyü aç'}
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: '#fff',
+              width: '38px',
+              height: '38px',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              fontSize: '1.15rem',
+              flexShrink: 0,
+              lineHeight: 1,
+            }}
+          >
+            {menuOpen ? '✕' : '☰'}
+          </button>
+        </div>
       </div>
 
-      {/* ─── Mobile Overlay Nav ─── */}
+      {/* ─── Mobile Fullscreen Menu ─── */}
       {menuOpen && (
         <div
           style={{
@@ -210,12 +188,13 @@ export default function Header() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(10,18,40,0.98)',
+            background: 'rgba(10,18,40,0.99)',
             display: 'flex',
             flexDirection: 'column',
-            padding: '32px 24px',
-            gap: '8px',
+            padding: '16px',
+            gap: '4px',
             overflowY: 'auto',
+            zIndex: 999,
           }}
         >
           {navLinks.map(({ href, labelKey }) => (
@@ -224,14 +203,13 @@ export default function Header() {
               href={href}
               onClick={() => setMenuOpen(false)}
               style={{
-                fontSize: '1.1rem',
+                fontSize: '1rem',
                 fontWeight: 500,
                 color: 'rgba(255,255,255,0.85)',
                 padding: '14px 16px',
                 borderRadius: '10px',
                 textDecoration: 'none',
                 borderBottom: '1px solid rgba(255,255,255,0.06)',
-                transition: 'background 0.2s',
               }}
             >
               {t(labelKey)}
@@ -241,7 +219,7 @@ export default function Header() {
             href="/pre-application"
             onClick={() => setMenuOpen(false)}
             style={{
-              marginTop: '16px',
+              marginTop: '12px',
               fontSize: '1rem',
               fontWeight: 600,
               color: '#ffffff',
@@ -250,15 +228,51 @@ export default function Header() {
               borderRadius: '12px',
               textDecoration: 'none',
               textAlign: 'center',
+              display: 'block',
             }}
           >
             {t('ctaContact')}
           </Link>
-          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center' }}>
             <LanguageSwitcher />
           </div>
         </div>
       )}
+
+      <style>{`
+        .hdr-logo-text {
+          font-size: 1rem;
+          font-weight: 700;
+          color: #ffffff;
+          letter-spacing: -0.02em;
+          line-height: 1.2;
+        }
+        .hdr-desktop-nav {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+          flex: 1;
+          justify-content: center;
+        }
+        .hdr-desktop-right {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-shrink: 0;
+        }
+        .hdr-mobile-right {
+          display: none;
+          align-items: center;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+        @media (max-width: 1023px) {
+          .hdr-desktop-nav { display: none !important; }
+          .hdr-desktop-right { display: none !important; }
+          .hdr-mobile-right { display: flex !important; }
+          .hdr-logo-text { display: none; }
+        }
+      `}</style>
     </header>
   );
 }

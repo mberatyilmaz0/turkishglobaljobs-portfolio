@@ -2,6 +2,14 @@
 import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import type { Metadata } from 'next';
+import { getContent } from '@/actions/content';
+import {
+  OPPORTUNITY_SCORING_DEFAULT,
+  OPPORTUNITY_REQUIREMENTS_DEFAULT,
+  type Bilingual,
+  type OpportunityScoringContent,
+  type OpportunityRequirementsContent,
+} from '@/lib/contentDefaults';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com';
 
@@ -20,35 +28,18 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-/* ─── Static data (bilgilendirici içerik) ────────────────── */
-const SCORE_CRITERIA = [
-  { icon: '🎓', points: 'max 20 puan', en: 'Qualification', tr: 'Eğitim Durumu', de: 'Qualifikation' },
-  { icon: '💼', points: 'max 12 puan', en: 'Work Experience', tr: 'İş Deneyimi', de: 'Berufserfahrung' },
-  { icon: '🗣️', points: 'max 15 puan', en: 'German Language', tr: 'Almanca Seviyesi', de: 'Deutschkenntnisse' },
-  { icon: '🔤', points: 'max 10 puan', en: 'English Language', tr: 'İngilizce Seviyesi', de: 'Englischkenntnisse' },
-  { icon: '📅', points: 'max  8 puan', en: 'Age', tr: 'Yaş', de: 'Alter' },
-  { icon: '🇩🇪', points: 'max  5 puan', en: 'Germany Connection', tr: 'Almanya Bağlantısı', de: 'Deutschlandbezug' },
-];
-
-const REQUIREMENTS = [
-  { icon: '📜', tr: 'Tanınan mesleki veya yükseköğretim diploması', de: 'Anerkannte Berufs- oder Hochschulausbildung' },
-  { icon: '💰', tr: "Almanya'da geçimini sağlayacak finansal kanıt", de: 'Finanzielle Absicherung des Aufenthalts' },
-  { icon: '🏥', tr: 'Geçerli sağlık sigortası', de: 'Krankenversicherungsnachweis' },
-  { icon: '✈️', tr: 'Geçerli pasaport', de: 'Gültiger Reisepass' },
-  { icon: '🎯', tr: 'Minimum 6 puanlık puan (puan hesaplayıcı ile öğrenin)', de: 'Mindestens 6 Punkte im Punktesystem' },
-];
-
-const STEPS = [
-  { icon: '📋', tr: 'Ücretsiz ön değerlendirme formumuzu doldurun', de: 'Kostenloses Erstbewertungsformular ausfüllen' },
-  { icon: '🔍', tr: 'Uzmanımız puanlarınızı hesaplar ve uygunluk analizi yapar', de: 'Unser Experte berechnet Ihre Punkte und prüft die Eignung' },
-  { icon: '📑', tr: 'Gerekli belgeler hazırlanır ve vize başvurusu yapılır', de: 'Unterlagen werden vorbereitet und Visum beantragt' },
-  { icon: 'DE', tr: "Almanya'ya yerleşin ve iş arayın", de: 'In Deutschland einleben und Arbeit suchen' },
-];
-
 export default async function FirsatKartiPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const isDE = locale === 'de';
+
+  const [scoringData, requirementsData] = await Promise.all([
+    getContent<Bilingual<OpportunityScoringContent>>('opportunity.scoring'),
+    getContent<Bilingual<OpportunityRequirementsContent>>('opportunity.requirements'),
+  ]);
+
+  const scoring = (isDE ? scoringData.de : scoringData.tr) ?? (isDE ? OPPORTUNITY_SCORING_DEFAULT.de : OPPORTUNITY_SCORING_DEFAULT.tr);
+  const requirements = (isDE ? requirementsData.de : requirementsData.tr) ?? (isDE ? OPPORTUNITY_REQUIREMENTS_DEFAULT.de : OPPORTUNITY_REQUIREMENTS_DEFAULT.tr);
 
   const heroTitle = isDE ? 'Die Chancenkarte für Deutschland' : 'Fırsat Kartı (Chancenkarte)';
   const heroSubtitle = isDE
@@ -125,22 +116,22 @@ export default async function FirsatKartiPage({ params }: { params: Promise<{ lo
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '56px' }}>
             <p style={{ fontSize: '0.78rem', fontWeight: 700, color: '#2563eb', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>
-              {isDE ? 'Punktesystem' : 'Puanlama Sistemi'}
+              {scoring.label}
             </p>
             <h2 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.25rem)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: '16px' }}>
-              {isDE ? 'Wie wird berechnet?' : 'Nasıl Hesaplanıyor?'}
+              {scoring.title}
             </h2>
             <p style={{ color: '#64748b', lineHeight: 1.7, maxWidth: '520px', margin: '0 auto' }}>
-              {isDE ? 'Mindestpunktzahl: 6 von max. 70 Punkten.' : 'Minimum puan: maksimum 70 üzerinden 6 puan.'}
+              {scoring.subtitle}
             </p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-            {SCORE_CRITERIA.map(({ icon, points, tr, de }, i) => (
+            {scoring.cards.map(({ icon, title, points }, i) => (
               <div key={i} className="score-card" style={{ background: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px', transition: 'box-shadow 0.2s' }}>
                 <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0 }}>{icon}</div>
                 <div>
-                  <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.975rem', marginBottom: '4px' }}>{isDE ? de : tr}</div>
+                  <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.975rem', marginBottom: '4px' }}>{title}</div>
                   <div style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 600 }}>{points}</div>
                 </div>
               </div>
@@ -154,18 +145,18 @@ export default async function FirsatKartiPage({ params }: { params: Promise<{ lo
         <div style={{ maxWidth: '760px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
             <p style={{ fontSize: '0.78rem', fontWeight: 700, color: '#2563eb', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>
-              {isDE ? 'Voraussetzungen' : 'Başvuru Şartları'}
+              {requirements.label}
             </p>
             <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2rem)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
-              {isDE ? 'Was brauche ich?' : 'Ne Lazım?'}
+              {requirements.title}
             </h2>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {REQUIREMENTS.map(({ icon, tr, de }, i) => (
+            {requirements.items.map(({ icon, text }, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '18px 24px', background: '#f8fafc', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
                 <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>{icon}</div>
-                <p style={{ color: '#374151', fontWeight: 500, fontSize: '0.95rem', margin: 0, lineHeight: 1.5 }}>{isDE ? de : tr}</p>
+                <p style={{ color: '#374151', fontWeight: 500, fontSize: '0.95rem', margin: 0, lineHeight: 1.5 }}>{text}</p>
               </div>
             ))}
           </div>
@@ -185,7 +176,12 @@ export default async function FirsatKartiPage({ params }: { params: Promise<{ lo
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-            {STEPS.map(({ icon, tr, de }, i) => (
+            {[
+              { icon: '📋', tr: 'Ücretsiz ön değerlendirme formumuzu doldurun', de: 'Kostenloses Erstbewertungsformular ausfüllen' },
+              { icon: '🔍', tr: 'Uzmanımız puanlarınızı hesaplar ve uygunluk analizi yapar', de: 'Unser Experte berechnet Ihre Punkte und prüft die Eignung' },
+              { icon: '📑', tr: 'Gerekli belgeler hazırlanır ve vize başvurusu yapılır', de: 'Unterlagen werden vorbereitet und Visum beantragt' },
+              { icon: 'DE', tr: 'Almanya\'ya yerleşin ve iş arayın', de: 'In Deutschland einleben und Arbeit suchen' },
+            ].map(({ icon, tr, de }, i) => (
               <div key={i} style={{ background: '#fff', borderRadius: '20px', padding: '32px 24px', textAlign: 'center', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(15,23,42,0.06)', position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, color: '#fff' }}>{i + 1}</div>
                 <div style={{ fontSize: '2rem', marginBottom: '12px', marginTop: '8px' }}>{icon}</div>

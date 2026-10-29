@@ -1,6 +1,16 @@
 import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import type { Metadata } from 'next';
+import { getContent } from '@/actions/content';
+import {
+  EDUCATION_COMPARE_DEFAULT,
+  EDUCATION_UNI_DEFAULT,
+  EDUCATION_AUS_DEFAULT,
+  type Bilingual,
+  type EducationCompareContent,
+  type EducationUniContent,
+  type EducationAusContent,
+} from '@/lib/contentDefaults';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com';
 
@@ -19,45 +29,25 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-/* ─── Tabs data ──────────────────────────────────────────── */
-const UNI_STEPS = [
-  { icon: '📜', tr: 'Denklik başvurusu (anabin / uni-assist üzerinden)', de: 'Ananerkennung über anabin/uni-assist' },
-  { icon: '🗣️', tr: 'Almanca dil belgesi (DSH, TestDaF veya B2/C1 sertifikası)', de: 'Deutschnachweis (DSH, TestDaF oder B2/C1)' },
-  { icon: '📋', tr: 'Üniversite başvurusu (Bewerbung)', de: 'Hochschulbewerbung (Bewerbung)' },
-  { icon: '✉️', tr: 'Kabul mektubu (Zulassung) alma', de: 'Zulassungsbescheid erhalten' },
-  { icon: '🏦', tr: 'Blokaj hesabı açma (Sperrkonto ~11.208 €)', de: 'Sperrkonto eröffnen (~11.208 €)' },
-  { icon: '🛂', tr: 'Öğrenci vizesi başvurusu', de: 'Studienvisum beantragen' },
-];
-
-const AUSBILDUNG_STEPS = [
-  { icon: '🔍', tr: 'Ausbildung ilanlarını araştırma (Bundesagentur für Arbeit vb.)', de: 'Ausbildungsangebote recherchieren' },
-  { icon: '🗣️', tr: 'Almanca seviyesi (genellikle B1-B2)', de: 'Deutschkenntnisse (i. d. R. B1-B2)' },
-  { icon: '📋', tr: 'Şirkete başvuru dosyası gönderme', de: 'Bewerbungsunterlagen einreichen' },
-  { icon: '✉️', tr: 'Ausbildungsvertrag (eğitim sözleşmesi) imzalama', de: 'Ausbildungsvertrag unterschreiben' },
-  { icon: '🛂', tr: 'Ausbildung vizesi başvurusu', de: 'Ausbildungsvisum beantragen' },
-  { icon: '🎓', tr: 'Eğitim süresi: 2-3.5 yıl | Ücretli: 600-900 €/ay', de: 'Ausbildungsdauer: 2-3,5 Jahre | Vergütung: 600-900 €/Monat' },
-];
-
-const UNI_PROGRAMS = [
-  { field: 'Mühendislik', de: 'Ingenieurwesen', note: 'Çok sayıda İngilizce program mevcut', noteDE: 'Viele englischsprachige Programme' },
-  { field: 'Bilgisayar Bilimleri', de: 'Informatik', note: 'Yüksek istihdam oranı', noteDE: 'Sehr hohe Beschäftigungsquote' },
-  { field: 'İşletme / MBA', de: 'BWL / MBA', note: 'Uluslararası tanınırlık', noteDE: 'Internationale Anerkennung' },
-  { field: 'Tıp / Hemşirelik', de: 'Medizin / Pflege', note: 'Denklik danışmanlığı şart', noteDE: 'Anerkennungsberatung erforderlich' },
-];
-
-const AUSBILDUNG_FIELDS = [
-  { icon: '⚙️', tr: 'Mekatronik', de: 'Mechatronik' },
-  { icon: '🖥️', tr: 'IT Uzmanı', de: 'IT-Fachinformatiker' },
-  { icon: '🏥', tr: 'Hemşire Yardımcısı', de: 'Pflegefachassistenz' },
-  { icon: '🍽️', tr: 'Aşçılık', de: 'Koch/Köchin' },
-  { icon: '🔧', tr: 'Elektrikçi', de: 'Elektriker' },
-  { icon: '🚗', tr: 'Otomotiv Teknisyeni', de: 'KFZ-Mechatroniker' },
-];
-
 export default async function EgitimPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const isDE = locale === 'de';
+
+  const [compareData, uniData, ausData] = await Promise.all([
+    getContent<Bilingual<EducationCompareContent>>('education.compare'),
+    getContent<Bilingual<EducationUniContent>>('education.uni'),
+    getContent<Bilingual<EducationAusContent>>('education.aus'),
+  ]);
+
+  const compare = isDE ? compareData.de : compareData.tr;
+  const uni = isDE ? uniData.de : uniData.tr;
+  const aus = isDE ? ausData.de : ausData.tr;
+
+  // Fallback güvencesi
+  const safeCompare = compare ?? (isDE ? EDUCATION_COMPARE_DEFAULT.de : EDUCATION_COMPARE_DEFAULT.tr);
+  const safeUni = uni ?? (isDE ? EDUCATION_UNI_DEFAULT.de : EDUCATION_UNI_DEFAULT.tr);
+  const safeAus = aus ?? (isDE ? EDUCATION_AUS_DEFAULT.de : EDUCATION_AUS_DEFAULT.tr);
 
   const ctaText = isDE ? 'Kostenlose Erstberatung starten' : 'Ücretsiz Ön Değerlendirme Başlat';
 
@@ -100,51 +90,33 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <p style={{ fontSize: '0.78rem', fontWeight: 700, color: '#2563eb', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
-              {isDE ? 'Schnellvergleich' : 'Hızlı Karşılaştırma'}
+              {safeCompare.label}
             </p>
             <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2rem)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
-              {isDE ? 'Was passt zu Ihnen?' : 'Size Uygun Olan Hangisi?'}
+              {safeCompare.title}
             </h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-            {[
-              {
-                icon: '🎓', title: isDE ? 'Universität' : 'Üniversite',
-                color: '#2563eb', bg: '#eff6ff',
-                rows: [
-                  [isDE ? 'Dauer' : 'Süre', isDE ? '3-5 Jahre' : '3-5 Yıl'],
-                  [isDE ? 'Abschluss' : 'Derece', 'Bachelor / Master'],
-                  [isDE ? 'Kosten' : 'Maliyet', isDE ? '~300 €/Semester (staatl.)' : '~300 €/Dönem (devlet üni.)'],
-                  [isDE ? 'Sprache' : 'Dil', 'B2/C1 Almanca veya İngilizce'],
-                ],
-              },
-              {
-                icon: '🔧', title: 'Ausbildung',
-                color: '#7c3aed', bg: '#f5f3ff',
-                rows: [
-                  [isDE ? 'Dauer' : 'Süre', isDE ? '2–3,5 Jahre' : '2–3,5 Yıl'],
-                  [isDE ? 'Abschluss' : 'Derece', isDE ? 'Berufsabschluss' : 'Meslek Sertifikası'],
-                  [isDE ? 'Vergütung' : 'Ücret', '600–900 €/Monat'],
-                  [isDE ? 'Sprache' : 'Dil', 'B1/B2 Almanca'],
-                ],
-              },
-            ].map(({ icon, title, color, bg, rows }, ci) => (
-              <div key={ci} style={{ background: '#fff', borderRadius: '20px', border: `2px solid ${bg}`, overflow: 'hidden', boxShadow: '0 4px 20px rgba(15,23,42,0.07)' }}>
-                <div style={{ background: bg, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '1.5rem' }}>{icon}</span>
-                  <span style={{ fontWeight: 800, color, fontSize: '1.1rem' }}>{title}</span>
+            {safeCompare.cards.map((card, ci) => {
+              const color = ci === 0 ? '#2563eb' : '#7c3aed';
+              const bg = ci === 0 ? '#eff6ff' : '#f5f3ff';
+              return (
+                <div key={ci} style={{ background: '#fff', borderRadius: '20px', border: `2px solid ${bg}`, overflow: 'hidden', boxShadow: '0 4px 20px rgba(15,23,42,0.07)' }}>
+                  <div style={{ background: bg, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{ fontWeight: 800, color, fontSize: '1.1rem' }}>{card.title}</span>
+                  </div>
+                  <div style={{ padding: '20px 24px' }}>
+                    {card.rows.map(({ label, value }, ri) => (
+                      <div key={ri} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '10px 0', borderBottom: ri < card.rows.length - 1 ? '1px solid #f1f5f9' : 'none', gap: '12px' }}>
+                        <span style={{ fontSize: '0.825rem', color: '#64748b', fontWeight: 600, flexShrink: 0 }}>{label}</span>
+                        <span style={{ fontSize: '0.875rem', color: '#0f172a', fontWeight: 600, textAlign: 'right' }}>{value}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div style={{ padding: '20px 24px' }}>
-                  {rows.map(([label, val], ri) => (
-                    <div key={ri} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '10px 0', borderBottom: ri < rows.length - 1 ? '1px solid #f1f5f9' : 'none', gap: '12px' }}>
-                      <span style={{ fontSize: '0.825rem', color: '#64748b', fontWeight: 600, flexShrink: 0 }}>{label}</span>
-                      <span style={{ fontSize: '0.875rem', color: '#0f172a', fontWeight: 600, textAlign: 'right' }}>{val}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -155,18 +127,18 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '56px', alignItems: 'start' }}>
             <div>
               <p style={{ fontSize: '0.78rem', fontWeight: 700, color: '#2563eb', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>
-                {isDE ? 'Hochschulstudium' : 'Üniversite Eğitimi'}
+                {safeUni.label}
               </p>
               <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.1rem)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: '20px' }}>
-                {isDE ? 'Schritt für Schritt zum Studium' : 'Üniversiteye Adım Adım'}
+                {safeUni.title}
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {UNI_STEPS.map(({ icon, tr, de }, i) => (
+                {safeUni.steps.map(({ icon, text }, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '16px 20px', background: '#fff', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
                     <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eff6ff', border: '1px solid #dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>{icon}</div>
                     <div>
                       <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#2563eb', display: 'block', marginBottom: '2px' }}>Adım {i + 1}</span>
-                      <p style={{ fontSize: '0.875rem', color: '#374151', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>{isDE ? de : tr}</p>
+                      <p style={{ fontSize: '0.875rem', color: '#374151', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>{text}</p>
                     </div>
                   </div>
                 ))}
@@ -175,16 +147,16 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
 
             <div>
               <p style={{ fontSize: '0.78rem', fontWeight: 700, color: '#2563eb', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>
-                {isDE ? 'Beliebte Studienfächer' : 'Popüler Bölümler'}
+                {safeUni.rightLabel}
               </p>
               <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', lineHeight: 1.3 }}>
-                {isDE ? 'Gefragte Studienrichtungen' : 'Yüksek Talep Gören Alanlar'}
+                {safeUni.rightTitle}
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {UNI_PROGRAMS.map(({ field, de: deField, note, noteDE }, i) => (
+                {safeUni.programs.map(({ name, tag }, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', background: '#fff', borderRadius: '14px', border: '1px solid #e2e8f0', gap: '12px' }}>
-                    <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{isDE ? deField : field}</span>
-                    <span style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 600, background: '#f0fdf4', padding: '4px 10px', borderRadius: '100px', whiteSpace: 'nowrap' }}>✓ {isDE ? noteDE : note}</span>
+                    <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{name}</span>
+                    <span style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 600, background: '#f0fdf4', padding: '4px 10px', borderRadius: '100px', whiteSpace: 'nowrap' }}>✓ {tag}</span>
                   </div>
                 ))}
               </div>
@@ -192,9 +164,7 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
               {/* Tip box */}
               <div style={{ marginTop: '24px', padding: '20px 24px', background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', borderRadius: '16px', border: '1px solid #bfdbfe' }}>
                 <p style={{ fontSize: '0.875rem', color: '#1e40af', lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
-                  💡 {isDE
-                    ? 'Viele deutsche Universitäten bieten englischsprachige Master-Programme an. Deutschkenntnisse ab B2 sind dennoch empfehlenswert.'
-                    : 'Pek çok Alman üniversitesi İngilizce yüksek lisans programı sunmaktadır. Yine de B2 Almanca seviyesi önerilir.'}
+                  💡 {safeUni.tipBox}
                 </p>
               </div>
             </div>
@@ -208,18 +178,18 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '56px', alignItems: 'start' }}>
             <div>
               <p style={{ fontSize: '0.78rem', fontWeight: 700, color: '#7c3aed', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>
-                Ausbildung
+                {safeAus.label}
               </p>
               <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.1rem)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: '20px' }}>
-                {isDE ? 'Schritt für Schritt zur Ausbildung' : 'Ausbildung\'a Adım Adım'}
+                {safeAus.title}
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {AUSBILDUNG_STEPS.map(({ icon, tr, de }, i) => (
+                {safeAus.steps.map(({ icon, text }, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '16px 20px', background: '#f8fafc', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
                     <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#f5f3ff', border: '1px solid #e9d5ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>{icon}</div>
                     <div>
                       <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#7c3aed', display: 'block', marginBottom: '2px' }}>Adım {i + 1}</span>
-                      <p style={{ fontSize: '0.875rem', color: '#374151', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>{isDE ? de : tr}</p>
+                      <p style={{ fontSize: '0.875rem', color: '#374151', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>{text}</p>
                     </div>
                   </div>
                 ))}
@@ -228,16 +198,16 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
 
             <div>
               <p style={{ fontSize: '0.78rem', fontWeight: 700, color: '#7c3aed', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>
-                {isDE ? 'Beliebte Ausbildungsberufe' : 'Popüler Ausbildung Alanları'}
+                {safeAus.rightLabel}
               </p>
               <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', lineHeight: 1.3 }}>
-                {isDE ? 'Gefragte Ausbildungsberufe' : 'Yüksek Talep Gören Meslekler'}
+                {safeAus.rightTitle}
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                {AUSBILDUNG_FIELDS.map(({ icon, tr, de }, i) => (
+                {safeAus.fields.map(({ icon, name }, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                     <span style={{ fontSize: '1.4rem' }}>{icon}</span>
-                    <span style={{ fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>{isDE ? de : tr}</span>
+                    <span style={{ fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>{name}</span>
                   </div>
                 ))}
               </div>
@@ -245,9 +215,7 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
               {/* Tip box */}
               <div style={{ marginTop: '24px', padding: '20px 24px', background: 'linear-gradient(135deg, #f5f3ff, #faf5ff)', borderRadius: '16px', border: '1px solid #e9d5ff' }}>
                 <p style={{ fontSize: '0.875rem', color: '#5b21b6', lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
-                  💡 {isDE
-                    ? 'Während der Ausbildung verdienen Sie direkt Geld: durchschnittlich 600-900 € im Monat – und übernommen werden viele!'
-                    : 'Ausbildung süresince maaş alırsınız: ortalama 600-900 €/ay. Eğitimin sonunda şirkete geçiş oranı çok yüksektir.'}
+                  💡 {safeAus.tipBox}
                 </p>
               </div>
             </div>
