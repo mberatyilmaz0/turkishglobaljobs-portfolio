@@ -35,6 +35,7 @@ export default function Header() {
     { href: '/education',         labelKey: 'germanyEducation' },
     { href: '/hakkimizda',        labelKey: 'aboutUs' },
     { href: '/almanya-rehberi',   labelKey: 'germanyGuide' },
+    { href: '/contact',           labelKey: 'contact' },
   ] as const;
 
   return (

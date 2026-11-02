@@ -25,26 +25,29 @@ export default async function ContactPage() {
   const settings = await getSettings();
   
   return (
-    <div className="contact-page">
-      <div className="contact-hero">
-        <div className="container">
+    <main className="contact-page">
+      <section className="contact-hero">
+        <div className="container contact-hero-content">
+          <span className="contact-hero-badge">
+            <AppIcon name="mail" size={15} /> Turkish Global
+          </span>
           <h1>{tc('contact')}</h1>
           <p className="contact-subtitle">{t('heroSubtitle')}</p>
         </div>
-      </div>
+      </section>
 
       <div className="container contact-content">
         <div className="contact-grid">
           {/* Adres Kartı */}
           <div className="contact-card">
-            <div className="contact-icon"><AppIcon name="location" size={28} /></div>
+            <div className="contact-icon"><AppIcon name="location" size={26} /></div>
             <h2>{t('addressTitle')}</h2>
             <p style={{ whiteSpace: 'pre-line' }}>{settings.address}</p>
           </div>
 
           {/* E-posta Kartı */}
           <div className="contact-card">
-            <div className="contact-icon"><AppIcon name="mail" size={28} /></div>
+            <div className="contact-icon"><AppIcon name="mail" size={26} /></div>
             <h2>{t('emailTitle')}</h2>
             <p>
               {settings.email.split('\n').map((email, i) => (
@@ -57,7 +60,7 @@ export default async function ContactPage() {
 
           {/* Telefon Kartı */}
           <div className="contact-card">
-            <div className="contact-icon"><AppIcon name="phone" size={28} /></div>
+            <div className="contact-icon"><AppIcon name="phone" size={26} /></div>
             <h2>{t('phoneTitle')}</h2>
             <p>
               {settings.phone.split('\n').map((phone, i) => (
@@ -71,7 +74,7 @@ export default async function ContactPage() {
 
         <div className="contact-note">
           <div className="contact-note-inner">
-            <div className="contact-note-icon"><AppIcon name="info" size={24} /></div>
+            <div className="contact-note-icon"><AppIcon name="info" size={22} /></div>
             <div className="contact-note-text">
               <h4>{t('noteTitle')}</h4>
               <p>{t.rich('noteText', { strong: (chunks) => <strong>{chunks}</strong> })}</p>
@@ -79,6 +82,6 @@ export default async function ContactPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

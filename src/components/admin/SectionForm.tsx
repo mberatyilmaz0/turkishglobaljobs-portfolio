@@ -44,12 +44,26 @@ function getPath(obj: unknown, path: string): string {
 function setPath(obj: unknown, path: string, value: string): unknown {
   const parts = path.split('.');
   if (parts.length === 1) {
+    if (Array.isArray(obj)) {
+      const next = [...obj];
+      next[Number(parts[0])] = value;
+      return next;
+    }
     return { ...(obj as Record<string, unknown>), [parts[0]]: value };
   }
+
   const [head, ...rest] = parts;
   const parent = obj as Record<string, unknown>;
   const child = parent[head] ?? (isNaN(Number(rest[0])) ? {} : []);
-  return { ...parent, [head]: setPath(child, rest.join('.'), value) };
+  const nextValue = setPath(child, rest.join('.'), value);
+
+  if (Array.isArray(obj)) {
+    const next = [...obj];
+    next[Number(head)] = nextValue;
+    return next;
+  }
+
+  return { ...parent, [head]: nextValue };
 }
 
 // ─── Yardımcı: data içinden dizi al ─────────────────────────────────────────
@@ -332,7 +346,12 @@ export default function SectionForm({ contentKey, tabs, initialData, defaultData
   const [activeTab, setActiveTab] = useState(tabs[0]?.key ?? '');
   const [data, setData] = useState<Record<string, unknown>>(initialData);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState('');
+  const [notice, setNotice] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const showNotice = (text: string, type: 'success' | 'error' | 'info') => {
+    setNotice({ text, type });
+    setTimeout(() => setNotice(null), 4000);
+  };
 
   const handleChange = (path: string, val: string) => {
     setData((prev) => setPath(prev, path, val) as Record<string, unknown>);
@@ -340,17 +359,24 @@ export default function SectionForm({ contentKey, tabs, initialData, defaultData
 
   const handleSave = async () => {
     setSaving(true);
-    setMsg('');
-    const res = await saveContent(contentKey, data);
-    setSaving(false);
-    setMsg(res.ok ? 'Kaydedildi!' : (res.error || 'Kaydedilemedi.'));
-    setTimeout(() => setMsg(''), 4000);
+    setNotice(null);
+
+    try {
+      const res = await saveContent(contentKey, data);
+      showNotice(
+        res.ok ? 'Kaydedildi!' : (res.error || 'Kaydedilemedi.'),
+        res.ok ? 'success' : 'error'
+      );
+    } catch {
+      showNotice('Kaydetme sırasında bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleReset = () => {
-    setData(defaultData);
-    setMsg('Varsayılan değerler yüklendi. Kaydetmek için "Kaydet" butonuna basın.');
-    setTimeout(() => setMsg(''), 4000);
+    setData(structuredClone(defaultData));
+    showNotice('Varsayılan değerler yüklendi. Kaydetmek için "Kaydet" butonuna basın.', 'info');
   };
 
   const activeTabDef = tabs.find((t) => t.key === activeTab);
@@ -431,9 +457,17 @@ export default function SectionForm({ contentKey, tabs, initialData, defaultData
         <button onClick={handleReset} className="btn btn-secondary" style={{ padding: '10px 20px' }}>
           Varsayılana Dön
         </button>
-        {msg && (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.875rem', fontWeight: 600, color: msg === 'Kaydedildi!' ? '#059669' : '#dc2626' }}>
-            <AppIcon name={msg === 'Kaydedildi!' ? 'check-circle' : 'error'} size={17} /> {msg}
+        {notice && (
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            fontSize: '0.875rem', fontWeight: 600,
+            color: notice.type === 'success' ? '#059669' : notice.type === 'error' ? '#dc2626' : '#2563eb',
+          }}>
+            <AppIcon
+              name={notice.type === 'success' ? 'check-circle' : notice.type === 'error' ? 'error' : 'info'}
+              size={17}
+            />
+            {notice.text}
           </span>
         )}
       </div>
