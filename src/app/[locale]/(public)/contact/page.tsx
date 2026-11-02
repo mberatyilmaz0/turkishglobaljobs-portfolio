@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { getSettings } from '@/actions/settings';
+import AppIcon from '@/components/ui/AppIcon';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -36,14 +37,14 @@ export default async function ContactPage() {
         <div className="contact-grid">
           {/* Adres Kartı */}
           <div className="contact-card">
-            <div className="contact-icon">📍</div>
+            <div className="contact-icon"><AppIcon name="location" size={28} /></div>
             <h2>{t('addressTitle')}</h2>
             <p style={{ whiteSpace: 'pre-line' }}>{settings.address}</p>
           </div>
 
           {/* E-posta Kartı */}
           <div className="contact-card">
-            <div className="contact-icon">✉️</div>
+            <div className="contact-icon"><AppIcon name="mail" size={28} /></div>
             <h2>{t('emailTitle')}</h2>
             <p>
               {settings.email.split('\n').map((email, i) => (
@@ -56,7 +57,7 @@ export default async function ContactPage() {
 
           {/* Telefon Kartı */}
           <div className="contact-card">
-            <div className="contact-icon">📞</div>
+            <div className="contact-icon"><AppIcon name="phone" size={28} /></div>
             <h2>{t('phoneTitle')}</h2>
             <p>
               {settings.phone.split('\n').map((phone, i) => (
@@ -70,7 +71,7 @@ export default async function ContactPage() {
 
         <div className="contact-note">
           <div className="contact-note-inner">
-            <div className="contact-note-icon">ℹ️</div>
+            <div className="contact-note-icon"><AppIcon name="info" size={24} /></div>
             <div className="contact-note-text">
               <h4>{t('noteTitle')}</h4>
               <p>{t.rich('noteText', { strong: (chunks) => <strong>{chunks}</strong> })}</p>

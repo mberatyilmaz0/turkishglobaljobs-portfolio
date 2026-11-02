@@ -3,6 +3,7 @@
 import { Link, useRouter } from '@/i18n/routing';
 import { updateApplicationStatus } from '@/actions/applications';
 import { useState } from 'react';
+import AppIcon from '@/components/ui/AppIcon';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -67,7 +68,7 @@ export default function ApplicationDetailClient({
             {user.cvUrl && (
               <div className="ap-detail-item">
                 <label>CV / Portfolyo</label>
-                <span><a href={user.cvUrl} target="_blank" rel="noopener" style={{ color: '#3b82f6', fontWeight: 600 }}>📄 CV İndir</a></span>
+                <span><a href={user.cvUrl} target="_blank" rel="noopener" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#3b82f6', fontWeight: 600 }}><AppIcon name="cv" size={17} /> CV İndir</a></span>
               </div>
             )}
           </div>
@@ -82,10 +83,10 @@ export default function ApplicationDetailClient({
           {/* Kabul Et / Reddet Butonları */}
           <div className="ap-actions">
             <button className="ap-btn-accept" onClick={() => handleStatus('ACCEPTED')} disabled={application.status === 'ACCEPTED'}>
-              ✓ Kabul Et
+              <AppIcon name="check" size={17} /> Kabul Et
             </button>
             <button className="ap-btn-reject" onClick={() => handleStatus('REJECTED')} disabled={application.status === 'REJECTED'}>
-              ✕ Reddet
+              <AppIcon name="x" size={17} /> Reddet
             </button>
           </div>
         </div>

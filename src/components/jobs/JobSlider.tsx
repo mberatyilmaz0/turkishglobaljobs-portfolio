@@ -4,6 +4,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Job } from '@prisma/client';
 import { useState, useEffect, useCallback } from 'react';
 import JobCard from './JobCard';
+import AppIcon from '@/components/ui/AppIcon';
 
 export default function JobSlider({ jobs, onSelectJob }: { jobs: Job[]; onSelectJob?: (job: Job) => void }) {
   const t = useTranslations('home');
@@ -32,7 +33,7 @@ export default function JobSlider({ jobs, onSelectJob }: { jobs: Job[]; onSelect
         <div className="container">
           <h2>{t('featuredJobs')}</h2>
           <div className="empty-state">
-            <div className="empty-state-icon">📋</div>
+            <div className="empty-state-icon"><AppIcon name="clipboard" size={42} /></div>
             <p>{t('noJobs')}</p>
           </div>
         </div>

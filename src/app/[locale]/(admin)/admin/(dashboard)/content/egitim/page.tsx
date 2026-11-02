@@ -55,7 +55,7 @@ const UNI_TABS: TabDef[] = [
         label: '6 Adım',
         type: 'list',
         itemFields: [
-          { key: 'icon', label: 'İkon (emoji)', type: 'text' },
+          { key: 'icon', label: 'İkon adı', type: 'text' },
           { key: 'text', label: 'Metin',        type: 'textarea' },
         ],
       },
@@ -87,7 +87,7 @@ const AUS_TABS: TabDef[] = [
         label: '6 Adım',
         type: 'list',
         itemFields: [
-          { key: 'icon', label: 'İkon (emoji)', type: 'text' },
+          { key: 'icon', label: 'İkon adı', type: 'text' },
           { key: 'text', label: 'Metin',        type: 'textarea' },
         ],
       },
@@ -96,7 +96,7 @@ const AUS_TABS: TabDef[] = [
         label: '6 Meslek',
         type: 'list',
         itemFields: [
-          { key: 'icon', label: 'İkon (emoji)', type: 'text' },
+          { key: 'icon', label: 'İkon adı', type: 'text' },
           { key: 'name', label: 'Meslek Adı',   type: 'text' },
         ],
       },

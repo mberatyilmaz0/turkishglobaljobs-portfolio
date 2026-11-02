@@ -8,6 +8,7 @@ import {
   CreditCard,
   Briefcase,
   Languages,
+  BookOpen,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -253,7 +254,7 @@ const S = {
     marginRight: "auto",
     boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
-  comingSoonEmoji: {
+  comingSoonIcon: {
     fontSize: "32px",
     display: "block",
     marginBottom: "12px",
@@ -326,7 +327,7 @@ function ArticlesSection({ locale }: { locale: string }) {
         </div>
 
         <div style={S.comingSoon}>
-          <span style={S.comingSoonEmoji}>📚</span>
+          <span style={S.comingSoonIcon}><BookOpen size={32} color="#2563eb" strokeWidth={1.8} /></span>
           <h3 style={S.comingSoonTitle}>Daha fazla içerik geliyor</h3>
           <p style={S.comingSoonText}>
             Bu sayfaya düzenli olarak yeni rehber makaleleri eklenecektir.

@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import AppIcon from '@/components/ui/AppIcon';
 import type { Job } from '@prisma/client';
 
 type JobWithCount = Job & { _count: { applications: number } };
@@ -42,19 +43,19 @@ export default function JobDetailClient({
             <span className="job-card-sector">{job.sector}</span>
             <h1>{title}</h1>
             <div className="job-detail-meta">
-              <span className="job-meta-tag">📍 {job.location}</span>
-              <span className="job-meta-tag">💼 {job.type}</span>
+              <span className="job-meta-tag"><AppIcon name="location" size={15} /> {job.location}</span>
+              <span className="job-meta-tag"><AppIcon name="briefcase" size={15} /> {job.type}</span>
               <span className="job-meta-tag">
-                📅 {new Date(job.createdAt).toLocaleDateString(locale)}
+                <AppIcon name="calendar" size={15} /> {new Date(job.createdAt).toLocaleDateString(locale)}
               </span>
               {salary && (
                 <span className="job-meta-tag" style={{ color: 'var(--primary, #2563eb)', fontWeight: 600 }}>
-                  💶 {salary}
+                  <AppIcon name="money" size={15} /> {salary}
                 </span>
               )}
               {langLevel && (
                 <span className="job-meta-tag" style={{ color: 'var(--accent, #16a34a)', fontWeight: 600 }}>
-                  🗣 {langLevel}
+                  <AppIcon name="language" size={15} /> {langLevel}
                 </span>
               )}
             </div>

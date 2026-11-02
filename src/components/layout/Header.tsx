@@ -5,6 +5,7 @@ import { Link } from '@/i18n/routing';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
+import AppIcon from '@/components/ui/AppIcon';
 
 export default function Header() {
   const t = useTranslations('common');
@@ -187,7 +188,7 @@ export default function Header() {
                 lineHeight: 1,
               }}
             >
-              {menuOpen ? '✕' : '☰'}
+              <AppIcon name={menuOpen ? 'x' : 'menu'} size={21} />
             </button>
           </div>
         </div>

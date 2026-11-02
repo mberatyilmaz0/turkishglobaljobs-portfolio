@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import type { Metadata } from 'next';
 import { getContent } from '@/actions/content';
+import AppIcon from '@/components/ui/AppIcon';
 import {
   EDUCATION_COMPARE_DEFAULT,
   EDUCATION_UNI_DEFAULT,
@@ -61,8 +62,8 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
       }}>
         <div aria-hidden style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(37,99,235,0.2) 0%, transparent 55%), radial-gradient(circle at 70% 50%, rgba(96,165,250,0.12) 0%, transparent 55%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
-          <span style={{ display: 'inline-block', padding: '6px 18px', borderRadius: '100px', background: 'rgba(37,99,235,0.2)', border: '1px solid rgba(96,165,250,0.35)', fontSize: '0.75rem', fontWeight: 700, color: '#93c5fd', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '24px' }}>
-            🎓 {isDE ? 'Studium & Ausbildung' : 'Almanya\'da Eğitim'}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 18px', borderRadius: '100px', background: 'rgba(37,99,235,0.2)', border: '1px solid rgba(96,165,250,0.35)', fontSize: '0.75rem', fontWeight: 700, color: '#93c5fd', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '24px' }}>
+            <AppIcon name="education" size={15} /> {isDE ? 'Studium & Ausbildung' : 'Almanya\'da Eğitim'}
           </span>
           <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.25rem)', fontWeight: 800, color: '#fff', lineHeight: 1.12, letterSpacing: '-0.03em', marginBottom: '20px' }}>
             {isDE ? 'Studium & Ausbildung in Deutschland' : 'Almanya\'da Üniversite ve Ausbildung'}
@@ -76,10 +77,10 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
           {/* Two option pills */}
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="#university" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '12px', background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', boxShadow: '0 6px 24px rgba(37,99,235,0.5)' }}>
-              🎓 {isDE ? 'Universität' : 'Üniversite'}
+              <AppIcon name="education" size={18} /> {isDE ? 'Universität' : 'Üniversite'}
             </a>
             <a href="#ausbildung" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)' }}>
-              🔧 Ausbildung
+              <AppIcon name="wrench" size={18} /> Ausbildung
             </a>
           </div>
         </div>
@@ -135,7 +136,7 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {safeUni.steps.map(({ icon, text }, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '16px 20px', background: '#fff', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eff6ff', border: '1px solid #dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>{icon}</div>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eff6ff', border: '1px solid #dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb', flexShrink: 0 }}><AppIcon name={icon} size={19} /></div>
                     <div>
                       <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#2563eb', display: 'block', marginBottom: '2px' }}>Adım {i + 1}</span>
                       <p style={{ fontSize: '0.875rem', color: '#374151', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>{text}</p>
@@ -156,15 +157,15 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
                 {safeUni.programs.map(({ name, tag }, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', background: '#fff', borderRadius: '14px', border: '1px solid #e2e8f0', gap: '12px' }}>
                     <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{name}</span>
-                    <span style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 600, background: '#f0fdf4', padding: '4px 10px', borderRadius: '100px', whiteSpace: 'nowrap' }}>✓ {tag}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.72rem', color: '#059669', fontWeight: 600, background: '#f0fdf4', padding: '4px 10px', borderRadius: '100px', whiteSpace: 'nowrap' }}><AppIcon name="check" size={13} /> {tag}</span>
                   </div>
                 ))}
               </div>
 
               {/* Tip box */}
               <div style={{ marginTop: '24px', padding: '20px 24px', background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', borderRadius: '16px', border: '1px solid #bfdbfe' }}>
-                <p style={{ fontSize: '0.875rem', color: '#1e40af', lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
-                  💡 {safeUni.tipBox}
+                <p style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: '0.875rem', color: '#1e40af', lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
+                  <AppIcon name="lightbulb" size={18} style={{ flexShrink: 0, marginTop: 3 }} /> {safeUni.tipBox}
                 </p>
               </div>
             </div>
@@ -186,7 +187,7 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {safeAus.steps.map(({ icon, text }, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '16px 20px', background: '#f8fafc', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#f5f3ff', border: '1px solid #e9d5ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>{icon}</div>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#f5f3ff', border: '1px solid #e9d5ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7c3aed', flexShrink: 0 }}><AppIcon name={icon} size={19} /></div>
                     <div>
                       <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#7c3aed', display: 'block', marginBottom: '2px' }}>Adım {i + 1}</span>
                       <p style={{ fontSize: '0.875rem', color: '#374151', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>{text}</p>
@@ -206,7 +207,7 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 {safeAus.fields.map(({ icon, name }, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <span style={{ fontSize: '1.4rem' }}>{icon}</span>
+                    <AppIcon name={icon} size={22} color="#7c3aed" />
                     <span style={{ fontWeight: 600, color: '#374151', fontSize: '0.875rem' }}>{name}</span>
                   </div>
                 ))}
@@ -214,8 +215,8 @@ export default async function EgitimPage({ params }: { params: Promise<{ locale:
 
               {/* Tip box */}
               <div style={{ marginTop: '24px', padding: '20px 24px', background: 'linear-gradient(135deg, #f5f3ff, #faf5ff)', borderRadius: '16px', border: '1px solid #e9d5ff' }}>
-                <p style={{ fontSize: '0.875rem', color: '#5b21b6', lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
-                  💡 {safeAus.tipBox}
+                <p style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: '0.875rem', color: '#5b21b6', lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
+                  <AppIcon name="lightbulb" size={18} style={{ flexShrink: 0, marginTop: 3 }} /> {safeAus.tipBox}
                 </p>
               </div>
             </div>

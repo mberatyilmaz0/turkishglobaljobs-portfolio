@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { saveContent } from '@/actions/content';
+import AppIcon from '@/components/ui/AppIcon';
 
 /*
   SectionForm: Verilen data objesini TR/DE iki sütun olarak gösterir.
@@ -146,7 +147,7 @@ function renderListField(
             {/* TR */}
             <div>
               <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#059669', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8, paddingBottom: 4, borderBottom: '2px solid #10b981' }}>
-                🇹🇷 Türkçe
+                <AppIcon name="turkey" size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} /> Türkçe
               </div>
               {itemFields.map((sub) => {
                 if (sub.type === 'list') return null; // iç içe list desteklenmiyor
@@ -158,7 +159,7 @@ function renderListField(
             {/* DE */}
             <div>
               <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#2563eb', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8, paddingBottom: 4, borderBottom: '2px solid #3b82f6' }}>
-                🇩🇪 Almanca
+                <AppIcon name="germany" size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} /> Almanca
               </div>
               {itemFields.map((sub) => {
                 if (sub.type === 'list') return null;
@@ -196,14 +197,14 @@ function renderListField(
                   {Array.from({ length: innerCount }).map((_, innerIdx) => (
                     <div key={innerIdx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 8, padding: '8px 10px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8 }}>
                       <div>
-                        <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#059669', marginBottom: 6 }}>🇹🇷 {innerIdx + 1}</div>
+                        <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#059669', marginBottom: 6 }}><AppIcon name="turkey" size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} /> {innerIdx + 1}</div>
                         {sub.itemFields.map((sf) => {
                           const fp = `tr.${fieldKey}.${idx}.${sub.key}.${innerIdx}.${sf.key}`;
                           return renderSimpleField(fp, sf.label, sf.type as 'text' | 'textarea', getPath(data, fp), onChange);
                         })}
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#2563eb', marginBottom: 6 }}>🇩🇪 {innerIdx + 1}</div>
+                        <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#2563eb', marginBottom: 6 }}><AppIcon name="germany" size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} /> {innerIdx + 1}</div>
                         {sub.itemFields.map((sf) => {
                           const fp = `de.${fieldKey}.${idx}.${sub.key}.${innerIdx}.${sf.key}`;
                           return renderSimpleField(fp, sf.label, sf.type as 'text' | 'textarea', getPath(data, fp), onChange);
@@ -292,23 +293,23 @@ function renderFaqField(
             <span style={{ fontWeight: 700, fontSize: '0.82rem', color: '#475569' }}>Soru {idx + 1}</span>
             <div style={{ display: 'flex', gap: 4 }}>
               <button type="button" onClick={() => moveItem(idx, -1)} disabled={idx === 0} title="Yukarı Taşı"
-                style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff', cursor: idx === 0 ? 'not-allowed' : 'pointer', opacity: idx === 0 ? 0.4 : 1 }}>↑</button>
+                style={{ display: 'flex', alignItems: 'center', padding: '4px 8px', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff', cursor: idx === 0 ? 'not-allowed' : 'pointer', opacity: idx === 0 ? 0.4 : 1 }}><AppIcon name="arrow-up" size={15} /></button>
               <button type="button" onClick={() => moveItem(idx, 1)} disabled={idx === count - 1} title="Aşağı Taşı"
-                style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff', cursor: idx === count - 1 ? 'not-allowed' : 'pointer', opacity: idx === count - 1 ? 0.4 : 1 }}>↓</button>
+                style={{ display: 'flex', alignItems: 'center', padding: '4px 8px', borderRadius: 6, border: '1px solid #e2e8f0', background: '#fff', cursor: idx === count - 1 ? 'not-allowed' : 'pointer', opacity: idx === count - 1 ? 0.4 : 1 }}><AppIcon name="arrow-down" size={15} /></button>
               <button type="button" onClick={() => removeItem(idx)} disabled={count <= 1} title="Sil"
-                style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff5f5', color: '#dc2626', cursor: count <= 1 ? 'not-allowed' : 'pointer', opacity: count <= 1 ? 0.4 : 1 }}>🗑</button>
+                style={{ display: 'flex', alignItems: 'center', padding: '4px 8px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff5f5', color: '#dc2626', cursor: count <= 1 ? 'not-allowed' : 'pointer', opacity: count <= 1 ? 0.4 : 1 }}><AppIcon name="trash" size={15} /></button>
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#059669', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8, paddingBottom: 4, borderBottom: '2px solid #10b981' }}>🇹🇷 Türkçe</div>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#059669', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8, paddingBottom: 4, borderBottom: '2px solid #10b981' }}><AppIcon name="turkey" size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} /> Türkçe</div>
               <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: '#64748b', marginBottom: 4 }}>Soru</label>
               <input type="text" style={INPUT_STYLE} value={trArr[idx]?.q ?? ''} onChange={(e) => updateItem('tr', idx, 'q', e.target.value)} />
               <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: '#64748b', marginBottom: 4, marginTop: 8 }}>Cevap</label>
               <textarea style={TEXTAREA_STYLE} value={trArr[idx]?.a ?? ''} onChange={(e) => updateItem('tr', idx, 'a', e.target.value)} />
             </div>
             <div>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#2563eb', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8, paddingBottom: 4, borderBottom: '2px solid #3b82f6' }}>🇩🇪 Almanca</div>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#2563eb', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8, paddingBottom: 4, borderBottom: '2px solid #3b82f6' }}><AppIcon name="germany" size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} /> Almanca</div>
               <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: '#64748b', marginBottom: 4 }}>Soru</label>
               <input type="text" style={INPUT_STYLE} value={deArr[idx]?.q ?? ''} onChange={(e) => updateItem('de', idx, 'q', e.target.value)} />
               <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: '#64748b', marginBottom: 4, marginTop: 8 }}>Cevap</label>
@@ -342,7 +343,7 @@ export default function SectionForm({ contentKey, tabs, initialData, defaultData
     setMsg('');
     const res = await saveContent(contentKey, data);
     setSaving(false);
-    setMsg(res.ok ? '✅ Kaydedildi!' : `❌ ${res.error}`);
+    setMsg(res.ok ? 'Kaydedildi!' : (res.error || 'Kaydedilemedi.'));
     setTimeout(() => setMsg(''), 4000);
   };
 
@@ -395,7 +396,8 @@ export default function SectionForm({ contentKey, tabs, initialData, defaultData
                     marginBottom: 12, paddingBottom: 6,
                     borderBottom: `2px solid ${lang === 'tr' ? '#10b981' : '#3b82f6'}`,
                   }}>
-                    {lang === 'tr' ? '🇹🇷 Türkçe' : '🇩🇪 Almanca'}
+                    <AppIcon name={lang === 'tr' ? 'turkey' : 'germany'} size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
+                    {lang === 'tr' ? 'Türkçe' : 'Almanca'}
                   </div>
                   {textFields.map((field) => {
                     const fullPath = `${lang}.${field.key}`;
@@ -430,8 +432,8 @@ export default function SectionForm({ contentKey, tabs, initialData, defaultData
           Varsayılana Dön
         </button>
         {msg && (
-          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: msg.startsWith('✅') ? '#059669' : '#dc2626' }}>
-            {msg}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.875rem', fontWeight: 600, color: msg === 'Kaydedildi!' ? '#059669' : '#dc2626' }}>
+            <AppIcon name={msg === 'Kaydedildi!' ? 'check-circle' : 'error'} size={17} /> {msg}
           </span>
         )}
       </div>

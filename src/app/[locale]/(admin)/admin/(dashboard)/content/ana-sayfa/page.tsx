@@ -42,7 +42,7 @@ const TABS: TabDef[] = [
         label: 'Kartlar (4 kart)',
         type: 'list',
         itemFields: [
-          { key: 'icon',  label: 'İkon (emoji)', type: 'text' },
+          { key: 'icon',  label: 'İkon adı', type: 'text' },
           { key: 'title', label: 'Kart Başlık',  type: 'text' },
           { key: 'desc',  label: 'Açıklama',     type: 'textarea' },
         ],

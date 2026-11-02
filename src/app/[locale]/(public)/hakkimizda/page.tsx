@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { getContent } from '@/actions/content';
+import AppIcon from '@/components/ui/AppIcon';
 import {
   ABOUT_PRINCIPLES_DEFAULT,
   type Bilingual,
@@ -19,28 +20,28 @@ export const metadata: Metadata = {
 const STEPS = [
   {
     number: '01',
-    emoji: '📋',
+    icon: 'clipboard',
     title: 'Ön Başvuru',
     subtitle: 'Bilgi Toplama',
     body: 'Adayın mevcut belgelerini, eğitim geçmişini ve hedeflerini sistematik biçimde topluyoruz. Bu aşamada hiçbir taahhütte bulunulmaz.',
   },
   {
     number: '02',
-    emoji: '📊',
+    icon: 'chart',
     title: 'Gerçekçi Değerlendirme',
     subtitle: 'Uygunluk Analizi',
     body: 'Toplanan bilgileri Alman kurumlarının güncel kriterlerine göre analiz ederek adayın gerçek uygunluk durumunu net şekilde raporluyoruz.',
   },
   {
     number: '03',
-    emoji: '🗺️',
+    icon: 'map',
     title: 'Yol Haritası ve Sözleşme',
     subtitle: 'Planlama',
     body: 'Değerlendirme sonrası adaya özel, adım adım bir yol haritası hazırlanır. Tüm hizmet kapsamı ve ücretler sözleşmeye bağlanır.',
   },
   {
     number: '04',
-    emoji: '👁️',
+    icon: 'eye',
     title: 'Şeffaf Süreç Takibi',
     subtitle: 'Takip ve Destek',
     body: 'Başvuru sürecinin her aşaması adaya düzenli olarak raporlanır. Herhangi bir engel veya olumsuz durum derhal bildirilir, gizlenmez.',
@@ -48,10 +49,10 @@ const STEPS = [
 ];
 
 const INFO_CARDS = [
-  { label: 'Türkiye Ofisi', sub: 'İstanbul merkezli operasyon ekibi', emoji: '🏢' },
-  { label: 'Almanya Ağı', sub: 'Berlin, Münih, Hamburg temsilcileri', emoji: '🇩🇪' },
-  { label: 'Resmî Partnerler', sub: 'Hukuk, tercüme ve eğitim kurumları', emoji: '📑' },
-  { label: 'Şeffaf Model', sub: 'Kim ne yapar? Her zaman açık', emoji: '🔍' },
+  { label: 'Türkiye Ofisi', sub: 'İstanbul merkezli operasyon ekibi', icon: 'building' },
+  { label: 'Almanya Ağı', sub: 'Berlin, Münih, Hamburg temsilcileri', icon: 'germany' },
+  { label: 'Resmî Partnerler', sub: 'Hukuk, tercüme ve eğitim kurumları', icon: 'documents' },
+  { label: 'Şeffaf Model', sub: 'Kim ne yapar? Her zaman açık', icon: 'search' },
 ];
 
 // ── Stiller ──────────────────────────────────────────────────────────────────
@@ -118,7 +119,7 @@ const S = {
   infoCard: { background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' },
   infoCardLabel: { fontSize: '15px', fontWeight: 700, color: '#0f172a', margin: 0 },
   infoCardSub: { fontSize: '13px', color: '#64748b', margin: '4px 0 0' },
-  infoCardEmoji: { fontSize: '20px', marginBottom: '8px', display: 'block' },
+  infoCardIcon: { fontSize: '20px', marginBottom: '8px', display: 'block' },
   warningBox: {
     background: '#fffbeb', border: '1px solid #fbbf24', borderRadius: '16px',
     padding: '20px 24px', textAlign: 'center' as const, marginTop: '36px',
@@ -132,7 +133,7 @@ const S = {
     background: '#fff', border: '1px solid #e2e8f0', borderRadius: '20px',
     padding: '28px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
   },
-  principleEmoji: {
+  principleIcon: {
     fontSize: '28px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
     width: '52px', height: '52px', background: '#eff6ff', borderRadius: '14px', marginBottom: '16px',
   },
@@ -254,9 +255,9 @@ export default async function HakkimizdaPage({ params }: Props) {
               </p>
             </div>
             <div style={S.grid2cards}>
-              {INFO_CARDS.map(({ label, sub, emoji }) => (
+              {INFO_CARDS.map(({ label, sub, icon }) => (
                 <div key={label} style={S.infoCard}>
-                  <span style={S.infoCardEmoji}>{emoji}</span>
+                  <span style={S.infoCardIcon}><AppIcon name={icon} size={22} color="#2563eb" /></span>
                   <p style={S.infoCardLabel}>{label}</p>
                   <p style={S.infoCardSub}>{sub}</p>
                 </div>
@@ -275,12 +276,14 @@ export default async function HakkimizdaPage({ params }: Props) {
             <p style={S.bodyTextLg}>{principles.subtitle}</p>
           </div>
           <div style={S.warningBox}>
-            <p style={S.warningText}>{principles.warning}</p>
+            <p style={{ ...S.warningText, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+              <AppIcon name="warning" size={20} style={{ flexShrink: 0 }} /> {principles.warning.replace(/^\u{26A0}\uFE0F?\s*/u, '')}
+            </p>
           </div>
           <div style={S.grid3}>
             {principles.cards.map(({ icon, title, desc }) => (
               <div key={title} style={S.principleCard}>
-                <span style={S.principleEmoji}>{icon}</span>
+                <span style={S.principleIcon}><AppIcon name={icon} size={27} color="#2563eb" /></span>
                 <h3 style={S.principleTitle}>{title}</h3>
                 <p style={S.principleBody}>{desc}</p>
               </div>
@@ -297,10 +300,10 @@ export default async function HakkimizdaPage({ params }: Props) {
             <h2 style={S.sectionH2}>4 Adımda Sürecimiz</h2>
           </div>
           <div style={S.grid4}>
-            {STEPS.map(({ number, emoji, title, subtitle, body }) => (
+            {STEPS.map(({ number, icon, title, subtitle, body }) => (
               <div key={number} style={S.stepCard}>
                 <span style={S.stepNumber}>{number}</span>
-                <div style={S.stepIconBox}>{emoji}</div>
+                <div style={S.stepIconBox}><AppIcon name={icon} size={23} color="#fff" /></div>
                 <p style={S.stepSubtitle}>{subtitle}</p>
                 <h3 style={S.stepTitle}>{title}</h3>
                 <p style={S.stepBody}>{body}</p>

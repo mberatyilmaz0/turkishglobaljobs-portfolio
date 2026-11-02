@@ -23,7 +23,7 @@ const SCORING_TABS: TabDef[] = [
         label: 'Kartlar (6 kart)',
         type: 'list',
         itemFields: [
-          { key: 'icon',   label: 'İkon (emoji)', type: 'text' },
+          { key: 'icon',   label: 'İkon adı', type: 'text' },
           { key: 'title',  label: 'Başlık',       type: 'text' },
           { key: 'points', label: 'Puan Metni',   type: 'text' },
         ],
@@ -44,7 +44,7 @@ const REQ_TABS: TabDef[] = [
         label: 'Maddeler (5 madde)',
         type: 'list',
         itemFields: [
-          { key: 'icon', label: 'İkon (emoji)', type: 'text' },
+          { key: 'icon', label: 'İkon adı', type: 'text' },
           { key: 'text', label: 'Metin',        type: 'textarea' },
         ],
       },

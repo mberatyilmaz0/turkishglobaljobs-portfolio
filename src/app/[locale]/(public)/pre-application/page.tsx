@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState } from 'react';
 import { Link } from '@/i18n/routing';
+import AppIcon from '@/components/ui/AppIcon';
 
 /* ─── Zod Schema ─────────────────────────────────────────── */
 const schema = z.object({
@@ -111,8 +112,8 @@ export default function OnBasvuruPage() {
             background: 'linear-gradient(135deg, #dcfce7, #bbf7d0)',
             border: '3px solid #22c55e',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '2.2rem', margin: '0 auto 28px',
-          }}>✓</div>
+            color: '#16a34a', margin: '0 auto 28px',
+          }}><AppIcon name="check" size={40} strokeWidth={2.4} /></div>
 
           <h1 style={{
             fontSize: '1.75rem', fontWeight: 800, color: '#0f172a',
@@ -282,6 +283,18 @@ export default function OnBasvuruPage() {
                       value={p}
                       style={{ accentColor: '#2563eb', width: '16px', height: '16px', flexShrink: 0 }}
                     />
+                    <AppIcon
+                      name={{
+                        job: 'briefcase',
+                        university: 'education',
+                        ausbildung: 'wrench',
+                        opportunityCard: 'opportunity-card',
+                        blueCard: 'blue-card',
+                        other: 'other',
+                      }[p]}
+                      size={17}
+                      color="#2563eb"
+                    />
                     {t(`purpose_${p}` as `purpose_${typeof PURPOSES[number]}`)}
                   </label>
                 ))}
@@ -359,7 +372,7 @@ export default function OnBasvuruPage() {
             }}>
               {[t('trust1'), t('trust2'), t('trust3')].map((label, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.825rem', color: '#374151', fontWeight: 500 }}>
-                  <span style={{ color: '#22c55e', fontSize: '1rem' }}>✓</span>
+                  <AppIcon name="check" size={16} color="#22c55e" />
                   {label}
                 </div>
               ))}
@@ -406,13 +419,14 @@ export default function OnBasvuruPage() {
               )}
             </button>
 
-            <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.78rem', marginTop: '16px' }}>
-              🔒 {t('privacyNote')}
+            <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, textAlign: 'center', color: '#94a3b8', fontSize: '0.78rem', marginTop: '16px' }}>
+              <AppIcon name="lock" size={14} /> {t('privacyNote')}
             </p>
 
             {/* ─ API Hata Mesajı ─ */}
             {apiError && (
               <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 marginTop: '16px',
                 padding: '14px 18px',
                 borderRadius: '12px',
@@ -423,7 +437,7 @@ export default function OnBasvuruPage() {
                 fontWeight: 500,
                 textAlign: 'center',
               }}>
-                ⚠️ {apiError}
+                <AppIcon name="warning" size={18} style={{ flexShrink: 0 }} /> {apiError}
               </div>
             )}
           </form>

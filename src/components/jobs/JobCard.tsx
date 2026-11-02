@@ -2,6 +2,7 @@
 
 import type { Job } from '@prisma/client';
 import { Link } from '@/i18n/routing';
+import AppIcon from '@/components/ui/AppIcon';
 
 function formatSalary(min?: number | null, max?: number | null): string | null {
   if (!min && !max) return null;
@@ -45,11 +46,12 @@ export default function JobCard({
       </p>
 
       <div className="job-card-meta" style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
-        <span>📍 {job.location}</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><AppIcon name="location" size={15} /> {job.location}</span>
 
         {salary && (
           <span
             style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
               background: 'var(--primary-light, #dbeafe)',
               color: 'var(--primary, #2563eb)',
               borderRadius: 6,
@@ -58,13 +60,14 @@ export default function JobCard({
               fontWeight: 600,
             }}
           >
-            💶 {salary}
+            <AppIcon name="money" size={15} /> {salary}
           </span>
         )}
 
         {langLevel && (
           <span
             style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
               background: 'var(--accent-light, #f0fdf4)',
               color: 'var(--accent, #16a34a)',
               borderRadius: 6,
@@ -73,7 +76,7 @@ export default function JobCard({
               fontWeight: 600,
             }}
           >
-            🗣 {langLevel}
+            <AppIcon name="language" size={15} /> {langLevel}
           </span>
         )}
       </div>

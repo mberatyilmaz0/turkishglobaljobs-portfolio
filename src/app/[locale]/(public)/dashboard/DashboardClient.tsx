@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { updateProfile, addExperience, deleteExperience, addEducation, deleteEducation, addSkill, deleteSkill, addLanguage, deleteLanguage, updateCvUrl } from '@/actions/profile';
 import { useRouter } from '@/i18n/routing';
+import AppIcon from '@/components/ui/AppIcon';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -120,22 +121,22 @@ export default function DashboardClient({
           <aside className="dashboard-sidebar">
             <nav className="sidebar-nav">
               <button className={`sidebar-link ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
-                👤 {t('personalInfo')}
+                <AppIcon name="user" size={18} /> {t('personalInfo')}
               </button>
               <button className={`sidebar-link ${activeTab === 'experience' ? 'active' : ''}`} onClick={() => setActiveTab('experience')}>
-                💼 {t('experience')}
+                <AppIcon name="briefcase" size={18} /> {t('experience')}
               </button>
               <button className={`sidebar-link ${activeTab === 'education' ? 'active' : ''}`} onClick={() => setActiveTab('education')}>
-                🎓 {t('education')}
+                <AppIcon name="education" size={18} /> {t('education')}
               </button>
               <button className={`sidebar-link ${activeTab === 'skills' ? 'active' : ''}`} onClick={() => setActiveTab('skills')}>
-                ⚡ {t('skills')}
+                <AppIcon name="skills" size={18} /> {t('skills')}
               </button>
               <button className={`sidebar-link ${activeTab === 'cv' ? 'active' : ''}`} onClick={() => setActiveTab('cv')}>
-                📄 {t('cv')}
+                <AppIcon name="cv" size={18} /> {t('cv')}
               </button>
               <button className={`sidebar-link ${activeTab === 'applications' ? 'active' : ''}`} onClick={() => setActiveTab('applications')}>
-                📋 {t('myApplications')}
+                <AppIcon name="clipboard" size={18} /> {t('myApplications')}
               </button>
             </nav>
           </aside>
@@ -174,7 +175,7 @@ export default function DashboardClient({
                 <h2>{t('experience')}</h2>
                 {profile?.experiences?.map((exp: any) => (
                   <div key={exp.id} className="exp-item">
-                    <button className="item-delete" onClick={() => handleDeleteExp(exp.id)}>✕</button>
+                    <button className="item-delete" onClick={() => handleDeleteExp(exp.id)}aria-label="Sil"><AppIcon name="x" size={14} /></button>
                     <h4>{exp.position} — {exp.company}</h4>
                     <p className="date-range">
                       {new Date(exp.startDate).toLocaleDateString(locale)} – {exp.current ? (locale === 'de' ? 'Laufend' : 'Devam Ediyor') : exp.endDate ? new Date(exp.endDate).toLocaleDateString(locale) : ''}
@@ -205,7 +206,7 @@ export default function DashboardClient({
                 <h2>{t('education')}</h2>
                 {profile?.educations?.map((edu: any) => (
                   <div key={edu.id} className="edu-item">
-                    <button className="item-delete" onClick={() => handleDeleteEdu(edu.id)}>✕</button>
+                    <button className="item-delete" onClick={() => handleDeleteEdu(edu.id)}aria-label="Sil"><AppIcon name="x" size={14} /></button>
                     <h4>{edu.degree} — {edu.institution}</h4>
                     {edu.field && <p>{edu.field}</p>}
                     <p className="date-range">
@@ -236,7 +237,7 @@ export default function DashboardClient({
                 <h2>{t('skills')}</h2>
                 <div className="tags-container">
                   {profile?.skills?.map((s: any) => (
-                    <span key={s.id} className="tag">{s.name}<button onClick={() => handleDeleteSkill(s.id)}>✕</button></span>
+                    <span key={s.id} className="tag">{s.name}<button onClick={() => handleDeleteSkill(s.id)}aria-label="Sil"><AppIcon name="x" size={14} /></button></span>
                   ))}
                 </div>
                 <div className="tag-input-row">
@@ -247,7 +248,7 @@ export default function DashboardClient({
                 <h2 style={{ marginTop: 32 }}>{t('languages')}</h2>
                 <div className="tags-container">
                   {profile?.languages?.map((l: any) => (
-                    <span key={l.id} className="tag">{l.name} ({l.level})<button onClick={() => handleDeleteLanguage(l.id)}>✕</button></span>
+                    <span key={l.id} className="tag">{l.name} ({l.level})<button onClick={() => handleDeleteLanguage(l.id)}aria-label="Sil"><AppIcon name="x" size={14} /></button></span>
                   ))}
                 </div>
                 <div className="tag-input-row">
@@ -266,7 +267,7 @@ export default function DashboardClient({
                 <h2>{t('cv')}</h2>
                 {profile?.cvUrl ? (
                   <div className="cv-upload-area has-file">
-                    <div className="cv-upload-icon">✅</div>
+                    <div className="cv-upload-icon"><AppIcon name="check-circle" size={42} /></div>
                     <p className="file-name">{t('downloadCV')}</p>
                     <a href={profile.cvUrl} target="_blank" rel="noopener" className="btn btn-secondary btn-sm" style={{ marginTop: 12 }}>{t('downloadCV')}</a>
                     <div style={{ marginTop: 16 }}>
@@ -278,7 +279,7 @@ export default function DashboardClient({
                   </div>
                 ) : (
                   <label className="cv-upload-area" style={{ cursor: 'pointer' }}>
-                    <div className="cv-upload-icon">📄</div>
+                    <div className="cv-upload-icon"><AppIcon name="cv" size={42} /></div>
                     <p>{uploading ? '...' : t('uploadCV')}</p>
                     <p style={{ fontSize: '0.8rem', marginTop: 8 }}>{t('maxFileSize')} • {t('onlyPDF')}</p>
                     <input type="file" accept=".pdf" onChange={handleCVUpload} style={{ display: 'none' }} />
@@ -292,7 +293,7 @@ export default function DashboardClient({
               <div className="profile-section fade-in">
                 <h2>{t('myApplications')}</h2>
                 {applications.length === 0 ? (
-                  <div className="empty-state"><div className="empty-state-icon">📋</div><p>{t('noApplications')}</p></div>
+                  <div className="empty-state"><div className="empty-state-icon"><AppIcon name="clipboard" size={42} /></div><p>{t('noApplications')}</p></div>
                 ) : (
                   <div className="applications-list">
                     {applications.map((app: any) => (

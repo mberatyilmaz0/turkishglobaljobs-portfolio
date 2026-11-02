@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import type { Job } from '@prisma/client';
+import AppIcon from '@/components/ui/AppIcon';
 
 /* ─── Salary / Relocation / German level helpers ─────────── */
 function getSalaryBadge(sector: string): string {
@@ -212,7 +213,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
 
           {/* CTA card */}
           <div style={{ marginTop: '20px', background: 'linear-gradient(135deg, #1e3a8a, #1d4ed8)', borderRadius: '20px', padding: '28px 24px', textAlign: 'center' }}>
-            <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🎯</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}><AppIcon name="target" size={34} /></div>
             <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff', marginBottom: '8px', lineHeight: 1.3 }}>{tg('sidebarCtaTitle')}</h3>
             <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', marginBottom: '16px', lineHeight: 1.6 }}>{tg('sidebarCtaDesc')}</p>
             <Link href="/on-basvuru" style={{ display: 'block', padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.25)', transition: 'background 0.2s' }}>
@@ -231,7 +232,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
 
           {currentJobs.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '80px 24px', background: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🔍</div>
+              <div style={{ display: 'flex', justifyContent: 'center', color: '#64748b', marginBottom: '16px' }}><AppIcon name="search" size={46} /></div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>{tc('noResults')}</h3>
               <p style={{ color: '#64748b', marginBottom: '20px' }}>{tg('tryDifferentFilters')}</p>
               <button onClick={reset} style={{ padding: '10px 24px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>{tg('resetFilters')}</button>
@@ -267,7 +268,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
                           <Badge>{job.sector}</Badge>
                           <Badge color="#7c3aed" bg="#f5f3ff">{job.type}</Badge>
-                          {job.isFeatured && <Badge color="#b45309" bg="#fef3c7">⭐ {tg('featured')}</Badge>}
+                          {job.isFeatured && <Badge color="#b45309" bg="#fef3c7"><AppIcon name="star" size={13} /> {tg('featured')}</Badge>}
                         </div>
 
                         {/* Title */}
@@ -283,22 +284,22 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
 
                         {/* Location */}
                         <div style={{ fontSize: '0.825rem', color: '#64748b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          📍 {job.location}
+                          <AppIcon name="location" size={15} /> {job.location}
                         </div>
 
                         {/* ── Germany immigration badges ── */}
                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px', paddingTop: '14px', borderTop: '1px solid #f1f5f9' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', borderRadius: '8px', background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
-                            <span style={{ fontSize: '0.75rem' }}>💰</span>
+                            <AppIcon name="finance" size={14} color="#15803d" />
                             <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#15803d' }}>{salary}</span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', borderRadius: '8px', background: '#f0f9ff', border: '1px solid #bae6fd' }}>
-                            <span style={{ fontSize: '0.75rem' }}>🌐</span>
+                            <AppIcon name="globe" size={14} color="#0369a1" />
                             <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#0369a1' }}>Almanca {germanLvl}</span>
                           </div>
                           {relocation && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', borderRadius: '8px', background: '#faf5ff', border: '1px solid #e9d5ff' }}>
-                              <span style={{ fontSize: '0.75rem' }}>✈️</span>
+                              <AppIcon name="plane" size={14} color="#7c3aed" />
                               <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#7c3aed' }}>{tg('relocationSupport')}</span>
                             </div>
                           )}
@@ -339,9 +340,9 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
               {/* Pagination */}
               {totalPages > 1 && (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '40px', flexWrap: 'wrap' }}>
-                  <button disabled={currentPage === 1} onClick={() => goPage(currentPage - 1)}
-                    style={{ padding: '10px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', opacity: currentPage === 1 ? 0.4 : 1 }}>
-                    ❮
+                  <button disabled={currentPage === 1} onClick={() => goPage(currentPage - 1)} aria-label="Önceki sayfa"
+                    style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#fff', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', opacity: currentPage === 1 ? 0.4 : 1 }}>
+                    <AppIcon name="chevron-left" size={18} />
                   </button>
                   {Array.from({ length: totalPages }).map((_, i) => {
                     const p = i + 1;
@@ -357,9 +358,9 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
                     }
                     return null;
                   })}
-                  <button disabled={currentPage === totalPages} onClick={() => goPage(currentPage + 1)}
-                    style={{ padding: '10px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#fff', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', opacity: currentPage === totalPages ? 0.4 : 1 }}>
-                    ❯
+                  <button disabled={currentPage === totalPages} onClick={() => goPage(currentPage + 1)} aria-label="Sonraki sayfa"
+                    style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#fff', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', opacity: currentPage === totalPages ? 0.4 : 1 }}>
+                    <AppIcon name="chevron-right" size={18} />
                   </button>
                 </div>
               )}

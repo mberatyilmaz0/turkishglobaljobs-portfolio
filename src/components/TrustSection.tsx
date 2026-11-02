@@ -2,21 +2,22 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import AppIcon from '@/components/ui/AppIcon';
 
 /* ─── Step Timeline ─────────────────────────────────────── */
 const STEPS = [
-  { icon: '📋', colorFrom: '#2563eb', colorTo: '#1d4ed8' },
-  { icon: '🔍', colorFrom: '#0891b2', colorTo: '#0e7490' },
-  { icon: '📑', colorFrom: '#7c3aed', colorTo: '#6d28d9' },
-  { icon: '✈️', colorFrom: '#059669', colorTo: '#047857' },
+  { icon: 'clipboard', colorFrom: '#2563eb', colorTo: '#1d4ed8' },
+  { icon: 'search', colorFrom: '#0891b2', colorTo: '#0e7490' },
+  { icon: 'documents', colorFrom: '#7c3aed', colorTo: '#6d28d9' },
+  { icon: 'plane', colorFrom: '#059669', colorTo: '#047857' },
 ] as const;
 
 /* ─── Metrics ────────────────────────────────────────────── */
 const METRICS = [
-  { value: '500+', icon: '👤' },
-  { value: '98%',  icon: '⭐' },
-  { value: '7+',   icon: '📅' },
-  { value: '3',    icon: '🌐' },
+  { value: '500+', icon: 'user' },
+  { value: '98%',  icon: 'star' },
+  { value: '7+',   icon: 'calendar' },
+  { value: '3',    icon: 'globe' },
 ] as const;
 
 /* ─── FAQ ────────────────────────────────────────────────── */
@@ -106,7 +107,7 @@ export default function TrustSection() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '1.75rem', marginBottom: '20px',
                 }}>
-                  {icon}
+                  <AppIcon name={icon} size={30} color={colorFrom} />
                 </div>
 
                 <h3 style={{
@@ -187,7 +188,7 @@ export default function TrustSection() {
                   (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
                 }}
               >
-                <div style={{ fontSize: '2rem', marginBottom: '12px' }}>{icon}</div>
+                <div style={{ display: 'flex', justifyContent: 'center', color: '#93c5fd', marginBottom: '12px' }}><AppIcon name={icon} size={30} /></div>
                 <div style={{
                   fontSize: '2.75rem', fontWeight: 800, color: '#ffffff',
                   lineHeight: 1, marginBottom: '8px',

@@ -3,6 +3,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import type { Metadata } from 'next';
 import { getContent } from '@/actions/content';
+import AppIcon from '@/components/ui/AppIcon';
 import {
   OPPORTUNITY_SCORING_DEFAULT,
   OPPORTUNITY_REQUIREMENTS_DEFAULT,
@@ -57,8 +58,8 @@ export default async function FirsatKartiPage({ params }: { params: Promise<{ lo
       }}>
         <div aria-hidden style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(37,99,235,0.2) 0%, transparent 55%), radial-gradient(circle at 70% 50%, rgba(96,165,250,0.12) 0%, transparent 55%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
-          <span style={{ display: 'inline-block', padding: '6px 18px', borderRadius: '100px', background: 'rgba(37,99,235,0.2)', border: '1px solid rgba(96,165,250,0.35)', fontSize: '0.75rem', fontWeight: 700, color: '#93c5fd', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '24px' }}>
-            🇩🇪 {isDE ? 'Neu ab 2024' : '2024\'ten İtibaren'}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 18px', borderRadius: '100px', background: 'rgba(37,99,235,0.2)', border: '1px solid rgba(96,165,250,0.35)', fontSize: '0.75rem', fontWeight: 700, color: '#93c5fd', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '24px' }}>
+            <AppIcon name="germany" size={15} /> {isDE ? 'Neu ab 2024' : '2024\'ten İtibaren'}
           </span>
           <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.25rem)', fontWeight: 800, color: '#fff', lineHeight: 1.12, letterSpacing: '-0.03em', marginBottom: '20px' }}>
             {heroTitle}
@@ -129,7 +130,7 @@ export default async function FirsatKartiPage({ params }: { params: Promise<{ lo
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
             {scoring.cards.map(({ icon, title, points }, i) => (
               <div key={i} className="score-card" style={{ background: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '16px', transition: 'box-shadow 0.2s' }}>
-                <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0 }}>{icon}</div>
+                <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb', flexShrink: 0 }}><AppIcon name={icon} size={25} /></div>
                 <div>
                   <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.975rem', marginBottom: '4px' }}>{title}</div>
                   <div style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 600 }}>{points}</div>
@@ -155,7 +156,7 @@ export default async function FirsatKartiPage({ params }: { params: Promise<{ lo
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {requirements.items.map(({ icon, text }, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '18px 24px', background: '#f8fafc', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
-                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>{icon}</div>
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#fff', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb', flexShrink: 0 }}><AppIcon name={icon} size={22} /></div>
                 <p style={{ color: '#374151', fontWeight: 500, fontSize: '0.95rem', margin: 0, lineHeight: 1.5 }}>{text}</p>
               </div>
             ))}
@@ -177,14 +178,14 @@ export default async function FirsatKartiPage({ params }: { params: Promise<{ lo
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
             {[
-              { icon: '📋', tr: 'Ücretsiz ön değerlendirme formumuzu doldurun', de: 'Kostenloses Erstbewertungsformular ausfüllen' },
-              { icon: '🔍', tr: 'Uzmanımız puanlarınızı hesaplar ve uygunluk analizi yapar', de: 'Unser Experte berechnet Ihre Punkte und prüft die Eignung' },
-              { icon: '📑', tr: 'Gerekli belgeler hazırlanır ve vize başvurusu yapılır', de: 'Unterlagen werden vorbereitet und Visum beantragt' },
-              { icon: 'DE', tr: 'Almanya\'ya yerleşin ve iş arayın', de: 'In Deutschland einleben und Arbeit suchen' },
+              { icon: 'clipboard', tr: 'Ücretsiz ön değerlendirme formumuzu doldurun', de: 'Kostenloses Erstbewertungsformular ausfüllen' },
+              { icon: 'search', tr: 'Uzmanımız puanlarınızı hesaplar ve uygunluk analizi yapar', de: 'Unser Experte berechnet Ihre Punkte und prüft die Eignung' },
+              { icon: 'documents', tr: 'Gerekli belgeler hazırlanır ve vize başvurusu yapılır', de: 'Unterlagen werden vorbereitet und Visum beantragt' },
+              { icon: 'germany', tr: 'Almanya\'ya yerleşin ve iş arayın', de: 'In Deutschland einleben und Arbeit suchen' },
             ].map(({ icon, tr, de }, i) => (
               <div key={i} style={{ background: '#fff', borderRadius: '20px', padding: '32px 24px', textAlign: 'center', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(15,23,42,0.06)', position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, color: '#fff' }}>{i + 1}</div>
-                <div style={{ fontSize: '2rem', marginBottom: '12px', marginTop: '8px' }}>{icon}</div>
+                <div style={{ display: 'flex', justifyContent: 'center', color: '#2563eb', marginBottom: '12px', marginTop: '8px' }}><AppIcon name={icon} size={32} /></div>
                 <p style={{ color: '#374151', fontSize: '0.9rem', fontWeight: 500, lineHeight: 1.6, margin: 0 }}>{isDE ? de : tr}</p>
               </div>
             ))}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import AppIcon from '@/components/ui/AppIcon';
 import type {
   HomeStatsContent,
   HomeServicesContent,
@@ -11,17 +12,10 @@ import type {
 } from '@/lib/contentDefaults';
 
 const PROCESS_STEPS = [
-  { icon: '📋', colorFrom: '#2563eb', colorTo: '#1d4ed8' },
-  { icon: '🔍', colorFrom: '#0891b2', colorTo: '#0e7490' },
-  { icon: '📑', colorFrom: '#7c3aed', colorTo: '#6d28d9' },
-  { icon: '✈️', colorFrom: '#059669', colorTo: '#047857' },
-] as const;
-
-const METRICS = [
-  { value: '500+', icon: '👤' },
-  { value: '98%', icon: '⭐' },
-  { value: '7+', icon: '📅' },
-  { value: '3', icon: '🌐' },
+  { icon: 'clipboard', colorFrom: '#2563eb', colorTo: '#1d4ed8' },
+  { icon: 'search', colorFrom: '#0891b2', colorTo: '#0e7490' },
+  { icon: 'documents', colorFrom: '#7c3aed', colorTo: '#6d28d9' },
+  { icon: 'plane', colorFrom: '#059669', colorTo: '#047857' },
 ] as const;
 
 type Props = {
@@ -33,7 +27,6 @@ type Props = {
 
 export default function HomeClient({ stats, services, process, faq }: Props) {
   const t = useTranslations('home');
-  const tTrust = useTranslations('trust');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // İstatistik şeridini gizle: tüm değerler boşsa
@@ -233,33 +226,6 @@ const allStatsEmpty = Array.isArray(stats?.items) ? stats.items.every((s) => !s.
             </Link>
           </div>
 
-          {/* Trust badges */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '24px',
-              marginTop: '56px',
-              flexWrap: 'wrap',
-            }}
-          >
-            {[t('trust1'), t('trust2'), t('trust3')].map((label, i) => (
-              <div
-                key={i}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  color: 'rgba(255,255,255,0.55)',
-                  fontSize: '0.85rem',
-                }}
-              >
-                <span style={{ color: '#34d399', fontSize: '1rem' }}>✓</span>
-                {label}
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Scroll indicator */}
@@ -360,7 +326,7 @@ const allStatsEmpty = Array.isArray(stats?.items) ? stats.items.every((s) => !s.
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '1.6rem', marginBottom: '20px',
                 }}>
-                  {icon}
+                  <AppIcon name={icon} size={28} color="#2563eb" />
                 </div>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '10px', lineHeight: 1.3 }}>
                   {title}
@@ -450,7 +416,7 @@ const allStatsEmpty = Array.isArray(stats?.items) ? stats.items.every((s) => !s.
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '1.75rem', marginBottom: '20px',
                   }}>
-                    {icon}
+                    <AppIcon name={icon} size={28} color={colorFrom} />
                   </div>
 
                   <h3 style={{
@@ -465,81 +431,6 @@ const allStatsEmpty = Array.isArray(stats?.items) ? stats.items.every((s) => !s.
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════
-          SUCCESS METRICS
-      ════════════════════════════════════════ */}
-      <section
-        id="metrics"
-        style={{
-          background: 'linear-gradient(135deg, #0a1228 0%, #0f2060 50%, #0a1228 100%)',
-          padding: '80px 16px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <div aria-hidden style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          backgroundImage: 'radial-gradient(circle at 25% 50%, rgba(37,99,235,0.18) 0%, transparent 55%), radial-gradient(circle at 75% 50%, rgba(96,165,250,0.12) 0%, transparent 55%)',
-        }} />
-
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-            <p style={{
-              fontSize: '0.78rem', fontWeight: 700, color: '#60a5fa',
-              letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px',
-            }}>
-              {tTrust('metricsLabel')}
-            </p>
-            <h2 style={{
-              fontSize: 'clamp(1.4rem, 3vw, 2.25rem)',
-              fontWeight: 800, color: '#ffffff',
-              letterSpacing: '-0.02em', lineHeight: 1.2,
-            }}>
-              {tTrust('metricsTitle')}
-            </h2>
-          </div>
-
-          <div className="home-cards-grid">
-            {METRICS.map(({ value, icon }, i) => (
-              <div
-                key={i}
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '20px',
-                  padding: '36px 24px',
-                  backdropFilter: 'blur(8px)',
-                  textAlign: 'center',
-                  transition: 'background 0.25s, transform 0.25s',
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)';
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)';
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)';
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                }}
-              >
-                <div style={{ fontSize: '2rem', marginBottom: '12px' }}>{icon}</div>
-                <div style={{
-                  fontSize: '2.75rem', fontWeight: 800, color: '#ffffff',
-                  lineHeight: 1, marginBottom: '8px',
-                  background: 'linear-gradient(135deg, #ffffff, #93c5fd)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}>
-                  {value}
-                </div>
-                <div style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>
-                  {tTrust(`metric${i + 1}` as `metric${1 | 2 | 3 | 4}`)}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
