@@ -1,12 +1,15 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
+import { notFound } from 'next/navigation';
 import Providers from '@/components/Providers';
 import '@/app/globals.css';
 
 import type { Metadata } from 'next';
 import { Inter, Outfit } from 'next/font/google';
-import { Analytics } from '@vercel/analytics/react';
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
+import CookieConsent from '@/components/analytics/CookieConsent';
+import { SITE_URL } from '@/lib/site';
 
 // next/font ile Google Fonts yüklemesi — render-blocking CSS kaldırılır
 const inter = Inter({
@@ -36,7 +39,18 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description: isDE
       ? 'Entdecken Sie internationale Karrieremöglichkeiten mit Turkish Global. Bewerben Sie sich auf aktuelle Stellenangebote in der Türkei und Europa und gestalten Sie Ihre Zukunft.'
       : 'Turkish Global ile uluslararası kariyer fırsatlarını keşfedin. Türkiye ve Avrupa\'daki en güncel iş ilanlarına hemen başvurun ve kariyerinize yön verin.',
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com'),
+    metadataBase: new URL(SITE_URL),
+    // WhatsApp / Facebook / LinkedIn paylaşım önizlemesi (sayfalar kendi başlığıyla geçersiz kılabilir)
+    openGraph: {
+      type: 'website',
+      siteName: 'Turkish Global',
+      locale: isDE ? 'de_DE' : 'tr_TR',
+      alternateLocale: isDE ? ['tr_TR'] : ['de_DE'],
+      images: [{ url: '/img/turkishglobal.webp', alt: 'Turkish Global' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+    },
   };
 }
 
@@ -52,6 +66,9 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  // Geçersiz dil kodu (örn. /test.php, /wp-login.php) → 200 sayfa yerine gerçek 404
+  // (Google'a aynı içeriği farklı adreslerde "soft 404" olarak göstermemek için)
+  if (!(routing.locales as readonly string[]).includes(locale)) notFound();
   setRequestLocale(locale);
   const messages = await getMessages();
 
@@ -65,9 +82,10 @@ export default async function LocaleLayout({
         <Providers>
           <NextIntlClientProvider locale={locale} messages={messages}>
             {children}
-            <Analytics />
+            <CookieConsent />
           </NextIntlClientProvider>
         </Providers>
+        <GoogleAnalytics />
       </body>
     </html>
   );

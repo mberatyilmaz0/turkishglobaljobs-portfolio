@@ -1,40 +1,43 @@
 # Turkish Global Jobs
 
-Türkçe ve Almanca dil desteğine sahip, Almanya odaklı kariyer ve danışmanlık platformu. Kullanıcılar iş ilanlarını inceleyip başvurabilir, aday profillerini yönetebilir ve ön başvuru gönderebilir. Yöneticiler ise ilanları, başvuruları, site içeriklerini ve iletişim bilgilerini yönetebilir.
+Türkçe ve Almanca dil desteğine sahip, Almanya odaklı kariyer ve danışmanlık sitesi. Ziyaretçiler iş ilanlarını inceler; başvuru ve iletişim talepleri **Ön Başvuru** ve **İletişim** formları üzerinden (isteğe bağlı CV ekiyle) e-posta olarak yöneticiye iletilir. Yöneticiler ilanları, site içeriklerini ve iletişim bilgilerini yönetir.
 
 Proje; Next.js 16 App Router, React 19, TypeScript, Prisma 7, PostgreSQL, Auth.js v5 ve next-intl üzerine inşa edilmiştir.
 
 ## Özellikler
 
-### Ziyaretçi ve adaylar
+### Ziyaretçiler
 
 - Türkçe ve Almanca arayüz ile dile özel, SEO uyumlu URL'ler
 - Sektör, çalışma tipi, konum, maaş ve dil seviyesine göre filtrelenebilen iş ilanları
-- İlan detayları ve oturum açan kullanıcılar için iş başvurusu
-- Kullanıcı kaydı ve e-posta/parola ile giriş
-- Kişisel bilgiler, iş deneyimleri, eğitimler, yetenekler, diller ve CV bağlantısı içeren aday profili
-- Adayın kendi başvurularını ve durumlarını takip edebildiği panel
+- Ön Başvuru formu (amaç, eğitim, Almanca seviyesi, not, isteğe bağlı CV)
+- İletişim sayfasında mesaj formu (isteğe bağlı CV)
+- CV'ler sunucuya kaydedilmez; bildirim e-postasına ek olarak gönderilir (PDF, DOC, DOCX · en fazla 5MB, içerik doğrulamalı)
 - Fırsat Kartı, Almanya'da eğitim, Almanya rehberi, hakkımızda ve iletişim sayfaları
-- SMTP üzerinden e-posta bildirimi gönderen ön başvuru formu
 
 ### Yönetim paneli
 
-- Rol tabanlı ve iki katmanlı yönetici erişim kontrolü
+- Rol tabanlı ve iki katmanlı yönetici erişim kontrolü (proxy + her Server Action'da veritabanından rol doğrulaması)
 - İlan oluşturma, düzenleme, silme, aktifleştirme ve öne çıkarma
-- Başvuruları aday profiliyle birlikte inceleme, durum güncelleme ve silme
-- Başvuru, kullanıcı, aktif ilan ve günlük ziyaret istatistikleri
+- Aktif/toplam/öne çıkan ilan ve günlük ziyaret istatistikleri
 - Ana sayfa, Fırsat Kartı, eğitim ve hakkımızda bölümleri için iki dilli içerik yönetimi
 - Adres, e-posta ve telefon bilgilerini yönetme
-- Görselleri Sharp ile yeniden boyutlandırıp WebP formatında kaydetme
 
-### SEO ve performans
+### SEO ve ölçüm
 
+- Dile özel canonical ve hreflang (`x-default` dahil) bağlantıları — `src/lib/site.ts`
+- Dinamik `sitemap.xml` (tüm sayfalar + aktif ilanlar, TR/DE) ve `robots.txt`
 - İlan detaylarında Schema.org `JobPosting` JSON-LD verisi
-- Dile özel canonical ve hreflang bağlantıları
-- Dinamik `sitemap.xml` ve `robots.txt`
-- Eski İngilizce URL'lerden yerelleştirilmiş URL'lere 301 yönlendirmeleri
-- AVIF/WebP görsel optimizasyonu ve `next/font` ile Inter/Outfit fontları
-- Vercel Analytics entegrasyonu
+- Open Graph paylaşım önizlemeleri
+- Eski İngilizce URL'lerden yerelleştirilmiş URL'lere kalıcı yönlendirmeler
+- Google Analytics 4 + Consent Mode v2 (çerez onayı alınmadan çerez yazılmaz)
+- Form gönderimlerinde GA4 `generate_lead` dönüşüm olayı
+
+### Güvenlik
+
+- Form ve giriş uç noktalarında IP / e-posta bazlı hız sınırı (`src/lib/rateLimit.ts`)
+- E-posta içeriğinde HTML kaçışı, alan uzunluk sınırları
+- CV eklerinde uzantı + dosya imzası (magic bytes) kontrolü
 
 ## Teknolojiler
 
@@ -44,13 +47,12 @@ Proje; Next.js 16 App Router, React 19, TypeScript, Prisma 7, PostgreSQL, Auth.j
 | Dil | TypeScript 5 |
 | Veritabanı | PostgreSQL |
 | ORM | Prisma 7, `@prisma/adapter-pg`, `pg` |
-| Kimlik doğrulama | Auth.js v5 (`next-auth`), JWT, Credentials Provider |
+| Kimlik doğrulama | Auth.js v5 (`next-auth`), JWT, Credentials Provider (yalnızca yönetici) |
 | Çoklu dil | next-intl 4 |
 | Form ve doğrulama | React Hook Form, Zod |
 | Stil | Özel CSS, CSS değişkenleri ve responsive tasarım |
-| Görsel işleme | Sharp |
 | E-posta | Nodemailer, Hostinger SMTP |
-| Analitik | Vercel Analytics |
+| Analitik | Google Analytics 4 |
 
 ## Sayfalar ve URL'ler
 
@@ -63,11 +65,12 @@ Uygulamanın varsayılan dili Türkçedir; desteklenen diller `tr` ve `de` olara
 | Fırsat Kartı | `/tr/firsat-karti` | `/de/chancenkarte` |
 | Eğitim | `/tr/almanya-egitim` | `/de/bildung-in-deutschland` |
 | Ön başvuru | `/tr/on-basvuru` | `/de/vorab-bewerbung` |
+| Almanya rehberi | `/tr/almanya-rehberi` | `/de/almanya-rehberi` |
+| Hakkımızda | `/tr/hakkimizda` | `/de/hakkimizda` |
 | İletişim | `/tr/contact` | `/de/contact` |
-| Aday paneli | `/tr/dashboard` | `/de/dashboard` |
 | Yönetici girişi | `/tr/admin/login` | `/de/admin/login` |
 
-Route grupları kaynak kodunda `(public)` ve `(admin)` olarak ayrılır. Yerelleştirilmiş URL eşlemeleri `src/i18n/routing.ts` içinde tanımlanır.
+Yerelleştirilmiş URL eşlemeleri `src/i18n/routing.ts` içinde tanımlanır; SEO adresleri için `src/lib/site.ts` içindeki eşleme bununla aynı tutulmalıdır.
 
 ## Kurulum
 
@@ -77,11 +80,9 @@ Route grupları kaynak kodunda `(public)` ve `(admin)` olarak ayrılır. Yerelle
 - npm
 - PostgreSQL veritabanı
 
-### 1. Depoyu klonlayın ve bağımlılıkları yükleyin
+### 1. Bağımlılıkları yükleyin
 
 ```bash
-git clone https://github.com/mberatyilmaz0/turkishglobaljobs-portfolio.git
-cd turkishglobaljobs-portfolio
 npm install
 ```
 
@@ -92,46 +93,35 @@ Proje kökünde `.env` dosyası oluşturun:
 ```dotenv
 DATABASE_URL="postgresql://kullanici:sifre@localhost:5432/turkish_global_jobs?schema=public"
 AUTH_SECRET="guclu-ve-rastgele-bir-anahtar"
-NEXT_PUBLIC_SITE_URL="http://localhost:3000"
+NEXT_PUBLIC_SITE_URL="https://www.turkishglobaljobs.com"
 
 SMTP_USER="smtp-kullanici-adiniz"
 SMTP_PASS="smtp-parolaniz"
 NOTIFICATION_EMAIL="bildirimlerin-gidecegi-adres"
+
+# İsteğe bağlı — verilmezse koddaki varsayılan GA4 kimliği kullanılır
+# NEXT_PUBLIC_GA_ID="G-XXXXXXXXXX"
 ```
 
 | Değişken | Açıklama |
 |---|---|
 | `DATABASE_URL` | PostgreSQL bağlantı adresi |
-| `AUTH_SECRET` | Auth.js oturum token'larını imzalamak ve çözmek için kullanılan gizli anahtar |
-| `NEXT_PUBLIC_SITE_URL` | Canonical, sitemap ve robots URL'lerinde kullanılan site adresi; production ortamında gerçek alan adı olmalıdır |
-| `SMTP_USER` | Hostinger SMTP kullanıcı adı |
-| `SMTP_PASS` | Hostinger SMTP parolası |
-| `NOTIFICATION_EMAIL` | Ön başvuru bildirimlerinin gönderileceği e-posta adresi |
+| `AUTH_SECRET` | Auth.js oturum token'larını imzalamak için gizli anahtar (`openssl rand -base64 32`) |
+| `NEXT_PUBLIC_SITE_URL` | Canonical, sitemap ve robots adreslerinin alan adı. Production'da `localhost` verilirse kod otomatik olarak `https://www.turkishglobaljobs.com` kullanır |
+| `SMTP_USER` / `SMTP_PASS` | Hostinger SMTP hesabı |
+| `NOTIFICATION_EMAIL` | Form bildirimlerinin (ve CV eklerinin) gideceği adres |
+| `NEXT_PUBLIC_GA_ID` | GA4 ölçüm kimliği (isteğe bağlı). Analytics yalnızca production build'de etkindir |
 
-SMTP ayarları yalnızca e-posta gönderimi için gereklidir. Gizli anahtar üretmek için örneğin `openssl rand -base64 32` komutu kullanılabilir.
+`NEXT_PUBLIC_*` değişkenleri build sırasında koda gömülür; değiştirildiğinde yeniden build gerekir.
 
 ### 3. Veritabanını hazırlayın
 
-Migration'ları uygulayın:
-
 ```bash
 npx prisma migrate dev
+npx prisma db seed   # isteğe bağlı: örnek yönetici ve ilanlar
 ```
 
-İsteğe bağlı olarak iki örnek yönetici hesabı ve altı örnek ilan ekleyin:
-
-```bash
-npx prisma db seed
-```
-
-Örnek yönetici girişi:
-
-```text
-E-posta: admin@example.com
-Parola:  changeme123
-```
-
-Bu bilgiler yalnızca yerel geliştirme içindir; ortak veya production ortamlarında kullanılmamalıdır. Seed işlemi örnek ilanları her çalıştırmada yeniden ekler.
+Seed ile gelen örnek yönetici bilgileri (`admin@example.com` / `changeme123`) yalnızca yerel geliştirme içindir.
 
 ### 4. Geliştirme sunucusunu başlatın
 
@@ -139,7 +129,17 @@ Bu bilgiler yalnızca yerel geliştirme içindir; ortak veya production ortamlar
 npm run dev
 ```
 
-Uygulama varsayılan olarak `http://localhost:3000` adresinde çalışır ve kök istek varsayılan dile yönlendirilir.
+## Production (VPS) notları
+
+- Uygulama Nginx arkasında PM2 ile çalışır (`deploy.sh`).
+- CV eklerinin gönderilebilmesi için Nginx `server` bloğunda istek boyutu sınırı yükseltilmelidir:
+
+  ```nginx
+  client_max_body_size 6M;
+  ```
+
+- Hız sınırları bellek içinde tutulur; PM2 yeniden başlatıldığında sıfırlanır.
+- Veritabanı aynı VPS'te ise düzenli yedek (`pg_dump`) alınmalıdır.
 
 ## Komutlar
 
@@ -150,7 +150,6 @@ Uygulama varsayılan olarak `http://localhost:3000` adresinde çalışır ve kö
 | `npm run build` | Production derlemesi oluşturur |
 | `npm run start` | Production sunucusunu başlatır |
 | `npx prisma migrate dev` | Veritabanı migration'larını uygular |
-| `npx prisma db seed` | Örnek verileri ekler |
 | `npx prisma studio` | Prisma Studio'yu açar |
 
 ## Proje yapısı
@@ -161,42 +160,33 @@ prisma/
 ├── schema.prisma        # Prisma veri modelleri
 └── seed.ts              # Örnek yönetici ve ilan verileri
 src/
-├── actions/             # Auth, ilan, başvuru, profil, içerik ve istatistik Server Actions
+├── actions/             # İlan, içerik, ayarlar ve istatistik Server Actions
 ├── app/
 │   ├── [locale]/
 │   │   ├── (admin)/     # Yönetici girişi ve paneli
-│   │   └── (public)/    # Genel sayfalar, ilanlar ve aday paneli
-│   ├── api/             # Auth, görsel yükleme ve e-posta route handler'ları
-│   ├── uploads/         # Yüklenen dosyalar için route
-│   ├── globals.css      # Global tasarım sistemi ve responsive stiller
+│   │   └── (public)/    # Genel sayfalar, ilanlar ve formlar
+│   ├── api/             # Auth.js ve e-posta (form + CV eki) route handler'ları
+│   ├── uploads/         # public/uploads altındaki görselleri sunan route
 │   ├── robots.ts        # robots.txt üretimi
 │   └── sitemap.ts       # Sitemap üretimi
-├── components/          # Arayüz, form, ilan ve yönetim bileşenleri
+├── components/
+│   ├── analytics/       # GA4 ve çerez onayı
+│   ├── forms/           # İletişim formu ve CV yükleme bileşeni
+│   └── ...              # Arayüz, ilan ve yönetim bileşenleri
 ├── i18n/                # next-intl istek ve route yapılandırması
-├── lib/                 # Auth, Prisma, doğrulama ve varsayılan içerikler
+├── lib/                 # Auth, yetki, Prisma, site URL'leri, analitik, hız sınırı
 ├── messages/            # Türkçe ve Almanca çeviriler
-├── types/               # Auth.js tip genişletmeleri
 └── proxy.ts             # Locale yönlendirmeleri ve yönetici erişim kontrolü
 ```
 
-## Mimari notlar
-
-- Veri işlemlerinin büyük bölümü Server Actions ile yürütülür. Auth.js, e-posta gönderimi ve görsel yükleme için ayrıca route handler'lar bulunur.
-- Yönetici sayfaları `src/proxy.ts` içinde JWT rol kontrolüyle korunur; sayfa ve Server Action seviyesindeki oturum/rol kontrolleri ikinci güvenlik katmanını oluşturur.
-- Parolalar `bcryptjs` ile hash'lenir. Bir kullanıcının aynı ilana birden fazla başvurusu veritabanındaki birleşik unique kısıtla engellenir.
-- İş ilanlarının Türkçe ve Almanca alanları aynı `Job` kaydında tutulur. Diğer site içerikleri `SiteContent` modelinde JSON olarak saklanır ve veritabanı kullanılamadığında varsayılan içeriklere dönülür.
-- Yüklenen görseller `public/uploads` altına yazılır. Bu nedenle deployment ortamında kalıcı ve yazılabilir dosya depolaması gerekir.
-
 ## Veri modeli
 
-Prisma şemasındaki başlıca modeller:
-
-- `User`, `Experience`, `Education`, `Skill`, `Language`: Kullanıcı ve aday profili
+- `User`: Yönetici hesapları (giriş için kullanılır)
 - `Job`: İki dilli iş ilanları
-- `Application`: Kullanıcı ve ilan arasındaki başvurular
 - `SiteVisit`: Günlük ziyaret sayaçları
 - `SiteSettings`: İletişim bilgileri
 - `SiteContent`: Yönetilebilir, iki dilli sayfa içerikleri
+- `Experience`, `Education`, `Skill`, `Language`, `Application`: Eski aday profili / başvuru sisteminden kalan tablolar. Kod artık kullanmıyor; veriler korunmak için şemada bırakıldı.
 
 ## Lisans
 

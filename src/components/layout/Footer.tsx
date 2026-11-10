@@ -30,8 +30,8 @@ export default function Footer() {
           <ul className="footer-links">
             <li><Link href="/">{common('home')}</Link></li>
             <li><Link href="/#jobs-slider">{common('jobs')}</Link></li>
-            <li><Link href="/auth/login">{common('login')}</Link></li>
-            <li><Link href="/auth/register">{common('register')}</Link></li>
+            <li><Link href="/pre-application">{common('ctaContact')}</Link></li>
+            <li><Link href="/contact">{common('contact')}</Link></li>
           </ul>
         </div>
 

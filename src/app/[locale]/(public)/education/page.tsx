@@ -13,20 +13,17 @@ import {
   type EducationAusContent,
 } from '@/lib/contentDefaults';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com';
+import { alternatesFor } from '@/lib/site';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const isDE = locale === 'de';
   return {
-    title: isDE ? 'Studium & Ausbildung in Deutschland | Turkish Global' : 'Almanya\'da Eğitim: Üniversite & Ausbildung | Turkish Global',
+    title: isDE ? 'Studium & Ausbildung in Deutschland' : 'Almanya\'da Eğitim: Üniversite & Ausbildung',
     description: isDE
       ? 'Alles über Studium und Ausbildung in Deutschland: Zulassungsvoraussetzungen, Bewerbungsprozess und wie Turkish Global Sie begleitet.'
       : 'Almanya\'da üniversite ve Ausbildung süreçleri, başvuru şartları, denklik ve Turkish Global danışmanlık hizmeti hakkında kapsamlı bilgi.',
-    alternates: {
-      canonical: isDE ? `${BASE_URL}/de/bildung-in-deutschland` : `${BASE_URL}/tr/almanya-egitim`,
-      languages: { tr: `${BASE_URL}/tr/almanya-egitim`, de: `${BASE_URL}/de/bildung-in-deutschland` },
-    },
+    alternates: alternatesFor(locale, '/education'),
   };
 }
 

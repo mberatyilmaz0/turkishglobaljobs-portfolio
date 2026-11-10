@@ -37,7 +37,6 @@ export default function JobsListClient({ jobs, locale }: { jobs: any[]; locale: 
               <th>İlan Adı</th>
               <th>Sektör</th>
               <th>Durum</th>
-              <th>Başvuru</th>
               <th>İşlemler</th>
             </tr>
           </thead>
@@ -51,7 +50,6 @@ export default function JobsListClient({ jobs, locale }: { jobs: any[]; locale: 
                     {job.isActive ? 'Aktif' : 'Pasif'}
                   </span>
                 </td>
-                <td>{job._count.applications}</td>
                 <td style={{ display: 'flex', gap: 8 }}>
                   <Link href={`/admin/jobs/${job.id}/edit`} className="btn btn-secondary btn-sm">{t('editJob')}</Link>
                   <button

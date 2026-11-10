@@ -10,10 +10,6 @@
     "ctaContact": "İletişim & Ön Başvuru",
     "jobs": "İş İlanları",
     "contact": "İletişim",
-    "login": "Giriş Yap",
-    "register": "Kayıt Ol",
-    "logout": "Çıkış Yap",
-    "dashboard": "Profilim",
     "admin": "Admin Panel",
     "save": "Kaydet",
     "cancel": "İptal",
@@ -95,55 +91,9 @@
     "loginButton": "Giriş Yap",
     "registerButton": "Kayıt Ol",
     "noAccount": "Hesabınız yok mu?",
-    "hasAccount": "Zaten hesabınız var mı?",
-    "registerHere": "Kayıt olun",
-    "loginHere": "Giriş yapın",
     "invalidCredentials": "E-posta veya şifre hatalı",
-    "emailExists": "Bu e-posta adresi zaten kayıtlı",
-    "passwordMismatch": "Şifreler eşleşmiyor",
-    "passwordTooShort": "Şifre en az 6 karakter olmalıdır",
     "invalidEmail": "Geçerli bir e-posta adresi giriniz",
-    "requiredField": "Bu alan zorunludur",
-    "registerSuccess": "Kayıt başarılı! Giriş yapabilirsiniz."
-  },
-  "profile": {
-    "title": "Profilim",
-    "personalInfo": "Kişisel Bilgiler",
-    "contactInfo": "İletişim Bilgileri",
-    "phone": "Telefon",
-    "experience": "İş Deneyimi",
-    "education": "Eğitim",
-    "skills": "Yetenekler",
-    "languages": "Diller",
-    "cv": "Özgeçmiş (CV)",
-    "uploadCV": "CV Yükle (PDF)",
-    "changeCV": "CV Değiştir",
-    "downloadCV": "CV İndir",
-    "noCV": "Henüz CV yüklenmemiş",
-    "company": "Şirket",
-    "position": "Pozisyon",
-    "startDate": "Başlangıç Tarihi",
-    "endDate": "Bitiş Tarihi",
-    "current": "Devam Ediyor",
-    "description": "Açıklama",
-    "institution": "Kurum",
-    "degree": "Derece/Diploma",
-    "field": "Alan/Bölüm",
-    "skillName": "Yetenek Adı",
-    "languageName": "Dil",
-    "languageLevel": "Seviye",
-    "addExperience": "Deneyim Ekle",
-    "addEducation": "Eğitim Ekle",
-    "addSkill": "Yetenek Ekle",
-    "addLanguage": "Dil Ekle",
-    "profileUpdated": "Profil güncellendi!",
-    "cvUploaded": "CV başarıyla yüklendi!",
-    "maxFileSize": "Maksimum dosya boyutu: 5MB",
-    "onlyPDF": "Sadece PDF dosyaları kabul edilir",
-    "myApplications": "Başvurularım",
-    "noApplications": "Henüz başvurunuz bulunmamaktadır.",
-    "applicationDate": "Başvuru Tarihi",
-    "status": "Durum"
+    "requiredField": "Bu alan zorunludur"
   },
   "admin": {
     "title": "Admin Panel",
@@ -185,12 +135,6 @@
     "saveSuccess": "İlan başarıyla kaydedildi",
     "statusUpdated": "Başvuru durumu güncellendi"
   },
-  "status": {
-    "PENDING": "Beklemede",
-    "REVIEWED": "İncelendi",
-    "ACCEPTED": "Kabul Edildi",
-    "REJECTED": "Reddedildi"
-  },
   "footer": {
     "rights": "Tüm hakları saklıdır.",
     "privacy": "Gizlilik Politikası",
@@ -207,8 +151,17 @@
     "addressLine3": "Türkiye",
     "emailTitle": "E-posta",
     "phoneTitle": "Telefon",
-    "noteTitle": "İş Başvuruları Hakkında Önemli Not",
-    "noteText": "Lütfen özgeçmişlerinizi (CV) e-posta yoluyla <strong>göndermeyiniz.</strong> İş başvurularınızı değerlendirmeye alabilmemiz için <strong>İş İlanları</strong> sayfamızdaki aktif ilanlara sistem üzerinden doğrudan başvuru yapmanız gerekmektedir. E-posta ile yapılan başvurular dikkate alınmamaktadır."
+    "noteTitle": "Başvurular Hakkında",
+    "noteText": "İş ve danışmanlık başvurularınız için <strong>Ön Başvuru</strong> formunu doldurabilir veya aşağıdaki form ile bize yazabilirsiniz. Dilerseniz <strong>CV'nizi</strong> forma ekleyebilirsiniz.",
+    "formTitle": "Bize Yazın",
+    "formSubtitle": "Sorularınızı iletin, dilerseniz CV'nizi de ekleyin. En kısa sürede size dönüş yapacağız.",
+    "messageLabel": "Mesajınız",
+    "messagePlaceholder": "Mesajınızı buraya yazın...",
+    "submitBtn": "Mesajı Gönder",
+    "submitting": "Gönderiliyor...",
+    "successTitle": "Mesajınız alındı!",
+    "successDesc": "En kısa sürede size dönüş yapacağız.",
+    "sendAnother": "Yeni mesaj gönder"
   },
   "trust": {
     "howLabel": "Nasıl Çalışıyoruz?",
@@ -277,7 +230,13 @@
     "submitBtn": "Ücretsiz Ön Değerlendirme Talep Et",
     "privacyNote": "Bilgileriniz üçüncü taraflarla paylaşılmaz.",
     "successTitle": "Talebiniz Alındı!",
-    "successDesc": "En kısa sürede, genellikle 24 saat içinde, uzman danışmanımız sizinle iletişime geçecektir."
+    "successDesc": "En kısa sürede, genellikle 24 saat içinde, uzman danışmanımız sizinle iletişime geçecektir.",
+    "cvLabel": "CV / Özgeçmiş",
+    "cvHint": "PDF, DOC veya DOCX · en fazla 5MB",
+    "cvChoose": "CV dosyanızı seçin",
+    "cvRemove": "Kaldır",
+    "cvInvalidType": "Sadece PDF, DOC veya DOCX dosyaları kabul edilir",
+    "cvTooLarge": "Dosya boyutu 5MB'ı aşamaz"
   },
   "germanyJobs": {
     "heroLabel": "Almanya İş Fırsatları",
@@ -298,5 +257,11 @@
     "sidebarCtaTitle": "Size Uygun İlanı Bulamadınız mı?",
     "sidebarCtaDesc": "Uzman ekibimiz sizi doğru pozisyonla buluşturur.",
     "sidebarCtaBtn": "Ücretsiz Danışmanlık Al"
+  },
+  "cookie": {
+    "title": "Çerez tercihleri",
+    "text": "Sitemizi geliştirmek ve ziyaret istatistiklerini ölçmek için Google Analytics çerezlerini kullanıyoruz. Onay vermezseniz bu çerezler kullanılmaz.",
+    "accept": "Kabul et",
+    "reject": "Reddet"
   }
-}
+}

@@ -12,20 +12,17 @@ import {
   type OpportunityRequirementsContent,
 } from '@/lib/contentDefaults';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com';
+import { alternatesFor } from '@/lib/site';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const isDE = locale === 'de';
   return {
-    title: isDE ? 'Chancenkarte Deutschland – Beratung | Turkish Global' : 'Fırsat Kartı (Chancenkarte) Danışmanlığı | Turkish Global',
+    title: isDE ? 'Chancenkarte Deutschland – Beratung' : 'Fırsat Kartı (Chancenkarte) Danışmanlığı',
     description: isDE
       ? 'Alles zur deutschen Chancenkarte: Punktesystem, Voraussetzungen und wie Turkish Global Sie bei der Antragstellung begleitet.'
       : 'Almanya Fırsat Kartı nedir, kimler başvurabilir, puanlama nasıl çalışır? Turkish Global uzmanlarıyla hızlı ve doğru başvuru yapın.',
-    alternates: {
-      canonical: isDE ? `${BASE_URL}/de/chancenkarte` : `${BASE_URL}/tr/firsat-karti`,
-      languages: { tr: `${BASE_URL}/tr/firsat-karti`, de: `${BASE_URL}/de/chancenkarte` },
-    },
+    alternates: alternatesFor(locale, '/opportunity-card'),
   };
 }
 

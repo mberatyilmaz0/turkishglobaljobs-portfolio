@@ -3,17 +3,24 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { getContent } from '@/actions/content';
 import AppIcon from '@/components/ui/AppIcon';
+import { alternatesFor, localizedPath } from '@/lib/site';
 import {
   ABOUT_PRINCIPLES_DEFAULT,
   type Bilingual,
   type AboutPrinciplesContent,
 } from '@/lib/contentDefaults';
 
-export const metadata: Metadata = {
-  title: 'Hakkimizda | Turkish Global Jobs',
-  description:
-    'Turkish Global Jobs olarak Almanya kariyer ve egitim sureclerinde seffaf, hukuki temellere dayanan danismanlik hizmeti sunuyoruz.',
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const isDE = locale === 'de';
+  return {
+    title: isDE ? 'Über uns' : 'Hakkımızda',
+    description: isDE
+      ? 'Turkish Global begleitet Sie transparent und rechtssicher auf Ihrem Karriere- und Bildungsweg nach Deutschland.'
+      : 'Turkish Global olarak Almanya kariyer ve eğitim süreçlerinde şeffaf, hukuki temellere dayanan danışmanlık hizmeti sunuyoruz.',
+    alternates: alternatesFor(locale, '/hakkimizda'),
+  };
+}
 
 // ── Sabit veriler (değişmeyecek bölümler) ────────────────────────────────────
 
@@ -322,7 +329,7 @@ export default async function HakkimizdaPage({ params }: Props) {
           Size en uygun yolu bulmak için ücretsiz ön değerlendirme formumuzu
           doldurun.
         </p>
-        <Link href="/pre-application" style={S.ctaBtn}>
+        <Link href={localizedPath(locale, '/pre-application')} style={S.ctaBtn}>
           Ön Başvuru Yap →
         </Link>
       </section>

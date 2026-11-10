@@ -1,12 +1,14 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import AppIcon from '@/components/ui/AppIcon';
+import CvUpload from '@/components/forms/CvUpload';
+import { trackLead } from '@/lib/analytics';
 
 /* ─── Zod Schema ─────────────────────────────────────────── */
 const schema = z.object({
@@ -56,32 +58,40 @@ export default function OnBasvuruPage() {
   const tc = useTranslations('common');
   const [submitted, setSubmitted] = useState(false);
   const [apiError, setApiError]   = useState<string | null>(null);
+  const [cvFile, setCvFile]       = useState<File | null>(null);
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
+
+  // Seçili değerleri izle → seçili kartı/rozeti görsel olarak vurgulamak için
+  const selectedLevel   = useWatch({ control, name: 'germanLevel' });
+  const selectedPurpose = useWatch({ control, name: 'purpose' });
 
   const onSubmit = async (data: FormData) => {
     setApiError(null);
     try {
-      const res = await fetch('/api/send-mail', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ad:              data.firstName,
-          soyad:           data.lastName,
-          eposta:          data.email,
-          telefon:         data.phone,
-          amac:            data.purpose,
-          egitimDurumu:    data.education,
-          almancaSeviyesi: data.germanLevel,
-          not:             data.note ?? '',
-        }),
-      });
-      const json = await res.json();
+      // CV dosyası eklenebilmesi için multipart/form-data gönderilir
+      const fd = new window.FormData();
+      fd.append('kaynak',          'basvuru');
+      fd.append('ad',              data.firstName);
+      fd.append('soyad',           data.lastName);
+      fd.append('eposta',          data.email);
+      fd.append('telefon',         data.phone);
+      fd.append('amac',            t(`purpose_${data.purpose}` as `purpose_${typeof PURPOSES[number]}`));
+      fd.append('egitimDurumu',    t(`edu_${data.education}` as `edu_${typeof EDUCATIONS[number]}`));
+      fd.append('almancaSeviyesi', data.germanLevel === 'none' ? t('levelNone') : data.germanLevel);
+      fd.append('not',             data.note ?? '');
+      if (cvFile) fd.append('cv', cvFile);
+
+      const res = await fetch('/api/send-mail', { method: 'POST', body: fd });
+      const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.success) throw new Error(json.error ?? 'Bilinmeyen hata');
+      // GA4 dönüşümü: ön değerlendirme talebi oluştu
+      trackLead('on_basvuru', { purpose: data.purpose, has_cv: !!cvFile });
       setSubmitted(true);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Mail gönderilemedi. Lütfen tekrar deneyin.');
@@ -269,13 +279,7 @@ export default function OnBasvuruPage() {
                 {PURPOSES.map(p => (
                   <label
                     key={p}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '10px',
-                      padding: '12px 14px', borderRadius: '12px',
-                      border: '1px solid #e2e8f0', cursor: 'pointer',
-                      fontSize: '0.875rem', color: '#374151', fontWeight: 500,
-                      transition: 'border-color 0.15s, background 0.15s',
-                    }}
+                    className={`choice-card${selectedPurpose === p ? ' is-selected' : ''}`}
                   >
                     <input
                       {...register('purpose')}
@@ -325,32 +329,34 @@ export default function OnBasvuruPage() {
             <div style={{ ...fieldWrap, marginBottom: '24px' }}>
               <label style={labelStyle}>{t('germanLevelLabel')}</label>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {LEVELS.map(lv => (
-                  <label
-                    key={lv}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '6px',
-                      padding: '10px 18px', borderRadius: '100px',
-                      border: '1px solid #e2e8f0', cursor: 'pointer',
-                      fontSize: '0.875rem', fontWeight: 600, color: '#374151',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <input
-                      {...register('germanLevel')}
-                      type="radio"
-                      value={lv}
-                      style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
-                    />
-                    {lv === 'none' ? t('levelNone') : lv}
-                  </label>
-                ))}
+                {LEVELS.map(lv => {
+                  const isSelected = selectedLevel === lv;
+                  return (
+                    <label
+                      key={lv}
+                      className={`level-pill${isSelected ? ' is-selected' : ''}`}
+                    >
+                      <input
+                        {...register('germanLevel')}
+                        type="radio"
+                        value={lv}
+                        className="sr-radio"
+                      />
+                      {isSelected && (
+                        <span className="level-check" aria-hidden="true">
+                          <AppIcon name="check" size={14} strokeWidth={3} />
+                        </span>
+                      )}
+                      {lv === 'none' ? t('levelNone') : lv}
+                    </label>
+                  );
+                })}
               </div>
               {errors.germanLevel && <span style={errStyle}>{errors.germanLevel.message}</span>}
             </div>
 
             {/* ─ Note ─ */}
-            <div style={{ ...fieldWrap, marginBottom: '32px' }}>
+            <div style={{ ...fieldWrap, marginBottom: '20px' }}>
               <label style={labelStyle}>{t('noteLabel')} <span style={{ color: '#94a3b8', fontWeight: 400 }}>({t('optional')})</span></label>
               <textarea
                 {...register('note')}
@@ -360,6 +366,11 @@ export default function OnBasvuruPage() {
                 onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.12)'; }}
                 onBlur={e  => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; }}
               />
+            </div>
+
+            {/* ─ CV (isteğe bağlı) ─ */}
+            <div style={{ marginBottom: '28px' }}>
+              <CvUpload file={cvFile} onChange={setCvFile} />
             </div>
 
             {/* ─ Trust row ─ */}
@@ -447,6 +458,64 @@ export default function OnBasvuruPage() {
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }
+        }
+
+        /* Ekrandan gizli ama klavye ile erişilebilir radio */
+        .sr-radio {
+          position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none;
+        }
+
+        /* ─ Almanca seviyesi rozetleri ─ */
+        .level-pill {
+          position: relative;
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 10px 18px; border-radius: 100px;
+          border: 1.5px solid #e2e8f0; background: #ffffff;
+          cursor: pointer; user-select: none;
+          font-size: 0.875rem; font-weight: 600; color: #374151;
+          transition: background .2s, border-color .2s, color .2s, box-shadow .2s, transform .15s;
+        }
+        .level-pill:hover {
+          border-color: #93c5fd; background: #f8fbff; transform: translateY(-1px);
+        }
+        .level-pill:active { transform: scale(.96); }
+        .level-pill:has(.sr-radio:focus-visible) {
+          box-shadow: 0 0 0 3px rgba(37,99,235,.25);
+        }
+        .level-pill.is-selected {
+          background: linear-gradient(135deg, #2563eb, #1d4ed8);
+          border-color: #1d4ed8; color: #ffffff;
+          box-shadow: 0 6px 16px rgba(37,99,235,.35);
+          animation: pillPop .28s cubic-bezier(.34,1.56,.64,1);
+        }
+        .level-check {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 18px; height: 18px; border-radius: 50%;
+          background: rgba(255,255,255,.25);
+          animation: checkIn .25s ease-out;
+        }
+        @keyframes pillPop {
+          0% { transform: scale(.92); }
+          100% { transform: scale(1); }
+        }
+        @keyframes checkIn {
+          from { opacity: 0; transform: scale(.4) rotate(-30deg); }
+          to   { opacity: 1; transform: scale(1) rotate(0); }
+        }
+
+        /* ─ Amaç kartları ─ */
+        .choice-card {
+          display: flex; align-items: center; gap: 10px;
+          padding: 12px 14px; border-radius: 12px;
+          border: 1.5px solid #e2e8f0; background: #ffffff; cursor: pointer;
+          font-size: 0.875rem; color: #374151; font-weight: 500;
+          transition: border-color .2s, background .2s, box-shadow .2s, transform .15s;
+        }
+        .choice-card:hover { border-color: #93c5fd; background: #f8fbff; }
+        .choice-card:active { transform: scale(.98); }
+        .choice-card.is-selected {
+          border-color: #2563eb; background: #eff6ff; color: #1e3a8a; font-weight: 600;
+          box-shadow: 0 0 0 3px rgba(37,99,235,.12);
         }
         @media (max-width: 600px) {
           form > div:first-of-type,

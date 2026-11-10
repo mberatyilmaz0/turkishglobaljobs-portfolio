@@ -1,6 +1,8 @@
 import { getTranslations } from 'next-intl/server';
 import { getSettings } from '@/actions/settings';
 import AppIcon from '@/components/ui/AppIcon';
+import ContactForm from '@/components/forms/ContactForm';
+import { alternatesFor } from '@/lib/site';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -10,12 +12,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: isDE ? 'Kontakt' : 'İletişim',
     description: isDE
-      ? 'Kontaktieren Sie Turkish Global. Erreichen Sie uns über Adresse, Telefon und E-Mail. Für Bewerbungen besuchen Sie bitte unsere Stellenangebote-Seite.'
-      : 'Turkish Global ile iletişime geçin. Adres, telefon ve e-posta bilgilerimiz üzerinden bize ulaşın. İş başvuruları için İş İlanları sayfamızı ziyaret edin.',
-    robots: {
-      index: false,
-      follow: true,
-    },
+      ? 'Kontaktieren Sie Turkish Global: Adresse, Telefon und E-Mail. Schreiben Sie uns über das Kontaktformular und hängen Sie Ihren Lebenslauf an.'
+      : 'Turkish Global ile iletişime geçin: adres, telefon ve e-posta bilgilerimiz. İletişim formu ile bize yazın, dilerseniz CV\'nizi de ekleyin.',
+    alternates: alternatesFor(locale, '/contact'),
   };
 }
 
@@ -81,6 +80,9 @@ export default async function ContactPage() {
             </div>
           </div>
         </div>
+
+        {/* İletişim formu (CV eklenebilir) */}
+        <ContactForm />
       </div>
     </main>
   );

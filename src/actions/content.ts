@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { auth } from '@/lib/auth';
+import { getAdminUser } from '@/lib/authz';
 import {
   HOME_STATS_DEFAULT,
   HOME_SERVICES_DEFAULT,
@@ -48,9 +48,23 @@ export async function getContent<T>(key: string): Promise<T> {
 }
 
 export async function saveContent(key: string, data: unknown): Promise<{ ok: boolean; error?: string }> {
-  const session = await auth();
-  if (!session || session.user?.role !== 'ADMIN') {
+  // Rol JWT yerine veritabanından doğrulanır
+  if (!(await getAdminUser())) {
     return { ok: false, error: 'Yetkisiz erişim' };
+  }
+
+  // Yalnızca tanımlı içerik anahtarları kaydedilebilir
+  if (!Object.prototype.hasOwnProperty.call(DEFAULTS, key)) {
+    return { ok: false, error: 'Geçersiz içerik anahtarı' };
+  }
+
+  // Aşırı büyük veri ile DB'yi şişirmeyi engelle (~500KB)
+  try {
+    if (JSON.stringify(data).length > 500_000) {
+      return { ok: false, error: 'İçerik çok büyük' };
+    }
+  } catch {
+    return { ok: false, error: 'Geçersiz içerik' };
   }
 
   if (!isDbAvailable()) return { ok: false, error: 'Veritabanı bağlantısı yok' };

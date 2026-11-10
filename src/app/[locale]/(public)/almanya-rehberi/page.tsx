@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { Metadata } from "next";
 import Link from "next/link";
+import { alternatesFor, localizedPath } from "@/lib/site";
 import {
   FileText,
   GraduationCap,
@@ -11,11 +12,17 @@ import {
   BookOpen,
 } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Almanya Rehberi | Turkish Global Jobs",
-  description:
-    "Almanya'da çalışma, eğitim ve yaşam hakkında güncel ve güvenilir bilgilendirmeler.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const isDE = locale === "de";
+  return {
+    title: isDE ? "Deutschland-Ratgeber" : "Almanya Rehberi: Çalışma, Eğitim ve Yaşam",
+    description: isDE
+      ? "Aktuelle und verlässliche Informationen zu Arbeit, Studium, Chancenkarte, Blauer Karte und Leben in Deutschland."
+      : "Almanya'da çalışma, eğitim, Fırsat Kartı, Mavi Kart, denklik ve yaşam hakkında güncel ve güvenilir bilgiler.",
+    alternates: alternatesFor(locale, "/almanya-rehberi"),
+  };
+}
 
 // ── Makale kartı verileri ve yönlendirme linkleri ────────────────────────────
 
@@ -27,7 +34,7 @@ const ARTICLES = [
     tag: "Vize & İzin",
     color: "#2563eb",
     bg: "#eff6ff",
-    href: "/firsat-karti",
+    href: "/opportunity-card",
   },
   {
     Icon: GraduationCap,
@@ -36,7 +43,7 @@ const ARTICLES = [
     tag: "Eğitim",
     color: "#7c3aed",
     bg: "#f5f3ff",
-    href: "/almanya-egitim",
+    href: "/education",
   },
   {
     Icon: Wrench,
@@ -45,7 +52,7 @@ const ARTICLES = [
     tag: "Mesleki Eğitim",
     color: "#ea580c",
     bg: "#fff7ed",
-    href: "/egitim",
+    href: "/education",
   },
   {
     Icon: CreditCard,
@@ -54,7 +61,7 @@ const ARTICLES = [
     tag: "Vize & İzin",
     color: "#0891b2",
     bg: "#ecfeff",
-    href: "/almanya-is",
+    href: "/jobs",
   },
   {
     Icon: Briefcase,
@@ -63,7 +70,7 @@ const ARTICLES = [
     tag: "İş Piyasası",
     color: "#16a34a",
     bg: "#f0fdf4",
-    href: "/almanya-is",
+    href: "/jobs",
   },
   {
     Icon: Languages,
@@ -72,7 +79,7 @@ const ARTICLES = [
     tag: "Dil",
     color: "#d97706",
     bg: "#fffbeb",
-    href: "/egitim",
+    href: "/education",
   },
 ] as const;
 
@@ -308,7 +315,7 @@ function ArticlesSection({ locale }: { locale: string }) {
           {ARTICLES.map(({ Icon, title, desc, tag, color, bg, href }) => (
             <Link
               key={title}
-              href={`/${locale}${href}`}
+              href={localizedPath(locale, href)}
               style={S.card}
               className="group hover:shadow-md hover:border-blue-300"
             >

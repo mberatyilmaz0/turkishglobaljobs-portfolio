@@ -2,6 +2,7 @@
 
 import type { Job } from '@prisma/client';
 import { Link } from '@/i18n/routing';
+import { jobLinkHref } from '@/lib/site';
 import AppIcon from '@/components/ui/AppIcon';
 
 function formatSalary(min?: number | null, max?: number | null): string | null {
@@ -90,7 +91,8 @@ export default function JobCard({
           Ön Başvuru Yap
         </Link>
         <Link
-          href={`/jobs/${job.id}`}
+          // Doğrudan dile özel adres (eski /jobs/ adresi 301 yönlendirmeye gidiyordu)
+          href={jobLinkHref(locale, job.id)}
           className="btn btn-secondary btn-sm"
           style={{ flex: 1, textAlign: 'center' }}
         >

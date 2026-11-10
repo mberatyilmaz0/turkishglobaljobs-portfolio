@@ -5,7 +5,7 @@ import { Link } from '@/i18n/routing';
 import AppIcon from '@/components/ui/AppIcon';
 import type { Job } from '@prisma/client';
 
-type JobWithCount = Job & { _count: { applications: number } };
+type JobWithCount = Job;
 
 function formatSalary(min?: number | null, max?: number | null): string | null {
   if (!min && !max) return null;

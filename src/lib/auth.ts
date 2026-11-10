@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
+import { rateLimit, getClientIp } from './rateLimit';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -12,14 +13,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+      async authorize(credentials, request) {
+        if (
+          typeof credentials?.email !== 'string' ||
+          typeof credentials?.password !== 'string' ||
+          !credentials.email ||
+          !credentials.password ||
+          credentials.email.length > 254 ||
+          credentials.password.length > 200
+        ) {
           return null;
+        }
+
+        // Kaba kuvvet (brute-force) koruması:
+        // e-posta başına 15 dakikada 10, IP başına 15 dakikada 30 deneme
+        const WINDOW = 15 * 60 * 1000;
+        const emailKey = credentials.email.trim().toLowerCase();
+        if (!rateLimit(`login:email:${emailKey}`, 10, WINDOW)) return null;
+        try {
+          const ip = request?.headers ? getClientIp(request.headers) : 'unknown';
+          if (ip !== 'unknown' && !rateLimit(`login:ip:${ip}`, 30, WINDOW)) return null;
+        } catch {
+          // header okunamazsa yalnızca e-posta limiti geçerli
         }
 
         try {
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email as string },
+            where: { email: credentials.email },
           });
 
           if (!user) return null;
@@ -48,7 +68,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: 'jwt',
   },
   pages: {
-    signIn: '/auth/login',
+    // Aday girişi kaldırıldı; tek giriş sayfası admin girişi
+    signIn: '/tr/admin/login',
   },
   callbacks: {
     async jwt({ token, user }) {

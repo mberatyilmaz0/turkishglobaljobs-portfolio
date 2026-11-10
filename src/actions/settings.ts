@@ -2,6 +2,8 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+import { requireAdmin } from '@/lib/authz';
 
 function isDbAvailable(): boolean {
   const url = process.env.DATABASE_URL || '';
@@ -30,7 +32,18 @@ export async function getSettings() {
   }
 }
 
-export async function updateSettings(data: { address: string; email: string; phone: string }) {
+const settingsSchema = z.object({
+  address: z.string().trim().min(1).max(1000),
+  email: z.string().trim().min(1).max(500),
+  phone: z.string().trim().min(1).max(500),
+});
+
+export async function updateSettings(input: { address: string; email: string; phone: string }) {
+  // Yalnızca admin iletişim bilgilerini değiştirebilir
+  await requireAdmin();
+
+  const data = settingsSchema.parse(input);
+
   if (!isDbAvailable()) return; // DB yoksa sessizce çık
 
   try {

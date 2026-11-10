@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import { jobLinkHref } from '@/lib/site';
 import type { Job } from '@prisma/client';
 import AppIcon from '@/components/ui/AppIcon';
 
@@ -320,7 +321,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
                             {tg('applyBtn')}
                           </Link>
                           <Link
-                            href={`/jobs/${job.id}`}
+                            href={jobLinkHref(locale, job.id)}
                             style={{
                               padding: '12px 16px', borderRadius: '12px', textDecoration: 'none',
                               background: '#f8fafc', border: '1px solid #e2e8f0',

@@ -10,10 +10,6 @@
     "ctaContact": "Kontakt & Voranmeldung",
     "jobs": "Stellenangebote",
     "contact": "Kontakt",
-    "login": "Anmelden",
-    "register": "Registrieren",
-    "logout": "Abmelden",
-    "dashboard": "Mein Profil",
     "admin": "Admin-Panel",
     "save": "Speichern",
     "cancel": "Abbrechen",
@@ -95,55 +91,9 @@
     "loginButton": "Anmelden",
     "registerButton": "Registrieren",
     "noAccount": "Noch kein Konto?",
-    "hasAccount": "Bereits ein Konto?",
-    "registerHere": "Registrieren",
-    "loginHere": "Anmelden",
     "invalidCredentials": "E-Mail oder Passwort falsch",
-    "emailExists": "Diese E-Mail-Adresse ist bereits registriert",
-    "passwordMismatch": "Passwörter stimmen nicht überein",
-    "passwordTooShort": "Das Passwort muss mindestens 6 Zeichen lang sein",
     "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-    "requiredField": "Dieses Feld ist erforderlich",
-    "registerSuccess": "Registrierung erfolgreich! Sie können sich jetzt anmelden."
-  },
-  "profile": {
-    "title": "Mein Profil",
-    "personalInfo": "Persönliche Daten",
-    "contactInfo": "Kontaktdaten",
-    "phone": "Telefon",
-    "experience": "Berufserfahrung",
-    "education": "Ausbildung",
-    "skills": "Fähigkeiten",
-    "languages": "Sprachen",
-    "cv": "Lebenslauf (CV)",
-    "uploadCV": "CV hochladen (PDF)",
-    "changeCV": "CV ändern",
-    "downloadCV": "CV herunterladen",
-    "noCV": "Noch kein CV hochgeladen",
-    "company": "Unternehmen",
-    "position": "Position",
-    "startDate": "Startdatum",
-    "endDate": "Enddatum",
-    "current": "Laufend",
-    "description": "Beschreibung",
-    "institution": "Institution",
-    "degree": "Abschluss",
-    "field": "Fachrichtung",
-    "skillName": "Fähigkeit",
-    "languageName": "Sprache",
-    "languageLevel": "Niveau",
-    "addExperience": "Erfahrung hinzufügen",
-    "addEducation": "Ausbildung hinzufügen",
-    "addSkill": "Fähigkeit hinzufügen",
-    "addLanguage": "Sprache hinzufügen",
-    "profileUpdated": "Profil aktualisiert!",
-    "cvUploaded": "CV erfolgreich hochgeladen!",
-    "maxFileSize": "Maximale Dateigröße: 5MB",
-    "onlyPDF": "Es werden nur PDF-Dateien akzeptiert",
-    "myApplications": "Meine Bewerbungen",
-    "noApplications": "Sie haben noch keine Bewerbungen.",
-    "applicationDate": "Bewerbungsdatum",
-    "status": "Status"
+    "requiredField": "Dieses Feld ist erforderlich"
   },
   "admin": {
     "title": "Admin-Panel",
@@ -185,12 +135,6 @@
     "saveSuccess": "Stelle erfolgreich gespeichert",
     "statusUpdated": "Bewerbungsstatus aktualisiert"
   },
-  "status": {
-    "PENDING": "Ausstehend",
-    "REVIEWED": "Überprüft",
-    "ACCEPTED": "Angenommen",
-    "REJECTED": "Abgelehnt"
-  },
   "footer": {
     "rights": "Alle Rechte vorbehalten.",
     "privacy": "Datenschutzrichtlinie",
@@ -207,8 +151,17 @@
     "addressLine3": "Türkei",
     "emailTitle": "E-Mail",
     "phoneTitle": "Telefon",
-    "noteTitle": "Wichtiger Hinweis zu Bewerbungen",
-    "noteText": "Bitte senden Sie Ihre Lebensläufe (CV) <strong>nicht</strong> per E-Mail. Damit wir Ihre Bewerbungen berücksichtigen können, müssen Sie sich direkt über unser System auf die aktiven Stellen auf unserer <strong>Stellenangebote</strong> Seite bewerben. Bewerbungen per E-Mail werden nicht berücksichtigt."
+    "noteTitle": "Hinweis zu Bewerbungen",
+    "noteText": "Für Ihre Bewerbung können Sie das <strong>Vorab-Bewerbung</strong>-Formular ausfüllen oder uns über das untenstehende Formular schreiben. Sie können Ihren <strong>Lebenslauf</strong> gerne anhängen.",
+    "formTitle": "Schreiben Sie uns",
+    "formSubtitle": "Senden Sie uns Ihre Fragen und hängen Sie bei Bedarf Ihren Lebenslauf an. Wir melden uns schnellstmöglich.",
+    "messageLabel": "Ihre Nachricht",
+    "messagePlaceholder": "Schreiben Sie hier Ihre Nachricht...",
+    "submitBtn": "Nachricht senden",
+    "submitting": "Wird gesendet...",
+    "successTitle": "Ihre Nachricht ist eingegangen!",
+    "successDesc": "Wir melden uns schnellstmöglich bei Ihnen.",
+    "sendAnother": "Neue Nachricht senden"
   },
   "trust": {
     "howLabel": "Wie arbeiten wir?",
@@ -277,7 +230,13 @@
     "submitBtn": "Kostenlose Erstbewertung anfordern",
     "privacyNote": "Ihre Daten werden nicht an Dritte weitergegeben.",
     "successTitle": "Anfrage eingegangen!",
-    "successDesc": "Unser Experte wird sich so bald wie möglich, in der Regel innerhalb von 24 Stunden, bei Ihnen melden."
+    "successDesc": "Unser Experte wird sich so bald wie möglich, in der Regel innerhalb von 24 Stunden, bei Ihnen melden.",
+    "cvLabel": "Lebenslauf (CV)",
+    "cvHint": "PDF, DOC oder DOCX · max. 5MB",
+    "cvChoose": "Lebenslauf auswählen",
+    "cvRemove": "Entfernen",
+    "cvInvalidType": "Es werden nur PDF-, DOC- oder DOCX-Dateien akzeptiert",
+    "cvTooLarge": "Die Datei darf maximal 5MB groß sein"
   },
   "germanyJobs": {
     "heroLabel": "Jobs in Deutschland",
@@ -298,5 +257,11 @@
     "sidebarCtaTitle": "Keine passende Stelle gefunden?",
     "sidebarCtaDesc": "Unser Team findet die richtige Position für Sie.",
     "sidebarCtaBtn": "Kostenlose Beratung"
+  },
+  "cookie": {
+    "title": "Cookie-Einstellungen",
+    "text": "Wir verwenden Google-Analytics-Cookies, um unsere Website zu verbessern und Besuchsstatistiken zu erfassen. Ohne Ihre Zustimmung werden diese Cookies nicht gesetzt.",
+    "accept": "Akzeptieren",
+    "reject": "Ablehnen"
   }
 }

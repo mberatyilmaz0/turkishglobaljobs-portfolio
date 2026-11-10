@@ -4,7 +4,9 @@ import { notFound } from 'next/navigation';
 import JobDetailClient from './JobDetailClient';
 import { Metadata } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.your-domain.com';
+import { SITE_URL, jobAlternates } from '@/lib/site';
+
+const BASE_URL = SITE_URL;
 
 // Çalışma tipini schema.org formatına çevir
 function mapEmploymentType(type: string): string {
@@ -93,13 +95,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: `${title} İş İlanı`,
     description,
-    alternates: {
-      canonical: `${BASE_URL}/${locale}/jobs/${id}`,
-      languages: {
-        'tr': `${BASE_URL}/tr/jobs/${id}`,
-        'de': `${BASE_URL}/de/jobs/${id}`,
-      },
-    },
+    alternates: jobAlternates(locale, id),
   };
 }
 

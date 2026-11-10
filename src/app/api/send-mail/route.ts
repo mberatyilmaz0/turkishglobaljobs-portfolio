@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { rateLimit, getClientIp } from "@/lib/rateLimit";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.hostinger.com",
@@ -11,7 +12,74 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function buildHtml(data: Record<string, string>): string {
+/** Kullanıcı girdisini HTML'e güvenle yerleştirmek için kaçış (mail içine link/HTML enjeksiyonunu engeller) */
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// Alan başına maksimum uzunluklar
+const FIELD_LIMITS: Record<string, number> = {
+  ad: 100,
+  soyad: 100,
+  eposta: 254,
+  telefon: 40,
+  amac: 200,
+  egitimDurumu: 200,
+  almancaSeviyesi: 50,
+  not: 3000,
+};
+
+const EMAIL_REGEX = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[^\s@<>()[\]\\,;:"]+$/;
+
+// ---- CV eki ----
+const MAX_CV_SIZE = 5 * 1024 * 1024; // 5MB
+
+const CV_TYPES: Record<string, { mime: string; check: (b: Buffer) => boolean }> = {
+  pdf: {
+    mime: "application/pdf",
+    check: (b) => b.subarray(0, 5).toString("ascii") === "%PDF-",
+  },
+  docx: {
+    mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    // DOCX bir ZIP dosyasıdır: "PK\x03\x04"
+    check: (b) => b[0] === 0x50 && b[1] === 0x4b && b[2] === 0x03 && b[3] === 0x04,
+  },
+  doc: {
+    mime: "application/msword",
+    // Eski Word (OLE2): D0 CF 11 E0
+    check: (b) => b[0] === 0xd0 && b[1] === 0xcf && b[2] === 0x11 && b[3] === 0xe0,
+  },
+};
+
+async function validateCv(
+  file: File
+): Promise<{ filename: string; content: Buffer; contentType: string } | { error: string }> {
+  if (file.size > MAX_CV_SIZE) return { error: "CV dosyası 5MB'ı aşamaz." };
+
+  const ext = (file.name.split(".").pop() || "").toLowerCase();
+  const type = CV_TYPES[ext];
+  if (!type) return { error: "CV için sadece PDF, DOC veya DOCX dosyaları kabul edilir." };
+
+  const content = Buffer.from(await file.arrayBuffer());
+  // Uzantı ile içerik uyuşuyor mu? (exe'yi .pdf diye göndermeyi engeller)
+  if (!type.check(content)) return { error: "CV dosyası geçersiz veya bozuk." };
+
+  // Dosya adını güvenli hale getir (yalnızca harf, rakam, - _ .)
+  const base = file.name
+    .replace(/\.[^.]+$/, "")
+    .normalize("NFKD")
+    .replace(/[^\w.-]+/g, "_")
+    .slice(0, 60) || "cv";
+
+  return { filename: `${base}.${ext}`, content, contentType: type.mime };
+}
+
+function buildHtml(data: Record<string, string>, formTitle: string, hasCv: boolean): string {
   const rows = [
     ["Ad",               data.ad],
     ["Soyad",            data.soyad],
@@ -21,6 +89,7 @@ function buildHtml(data: Record<string, string>): string {
     ["Eğitim Durumu",    data.egitimDurumu],
     ["Almanca Seviyesi", data.almancaSeviyesi],
     ["Not",              data.not],
+    ["CV",               hasCv ? "Ekte gönderildi" : ""],
   ]
     .filter(([, v]) => v)
     .map(
@@ -30,7 +99,7 @@ function buildHtml(data: Record<string, string>): string {
           ${label}
         </td>
         <td style="padding:10px 16px;color:#0f172a;border-bottom:1px solid #e2e8f0;font-size:14px;">
-          ${value}
+          ${escapeHtml(value).replace(/\r?\n/g, "<br />")}
         </td>
       </tr>`
     )
@@ -51,7 +120,7 @@ function buildHtml(data: Record<string, string>): string {
               Turkish Global Jobs
             </h1>
             <p style="margin:6px 0 0;color:#bfdbfe;font-size:14px;">
-              Yeni Ön Başvuru / İletişim Formu
+              Yeni ${formTitle}
             </p>
           </td>
         </tr>
@@ -87,18 +156,66 @@ function buildHtml(data: Record<string, string>): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    // IP başına hız sınırı: 10 dakikada en fazla 5 form
+    const ip = getClientIp(req.headers);
+    if (!rateLimit(`send-mail:${ip}`, 5, 10 * 60 * 1000)) {
+      return NextResponse.json(
+        { success: false, error: "Çok fazla deneme yaptınız. Lütfen biraz sonra tekrar deneyin." },
+        { status: 429 }
+      );
+    }
 
-    const {
-      ad = "",
-      soyad = "",
-      eposta = "",
-      telefon = "",
-      amac = "",
-      egitimDurumu = "",
-      almancaSeviyesi = "",
-      not = "",
-    } = body as Record<string, string>;
+    // Formlar multipart/form-data gönderir (CV eki için). JSON da desteklenir.
+    const isMultipart = (req.headers.get("content-type") || "").includes("multipart/form-data");
+    let body: Record<string, unknown> | null = null;
+    let cvFile: File | null = null;
+
+    if (isMultipart) {
+      const fd = await req.formData().catch(() => null);
+      if (fd) {
+        body = {};
+        for (const key of [...Object.keys(FIELD_LIMITS), "kaynak"]) {
+          const v = fd.get(key);
+          if (typeof v === "string") body[key] = v;
+        }
+        const f = fd.get("cv");
+        if (f instanceof File && f.size > 0) cvFile = f;
+      }
+    } else {
+      body = await req.json().catch(() => null);
+    }
+
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ success: false, error: "Geçersiz istek." }, { status: 400 });
+    }
+
+    // ---- CV eki doğrulama (isteğe bağlı) ----
+    let attachment: { filename: string; content: Buffer; contentType: string } | undefined;
+    if (cvFile) {
+      const result = await validateCv(cvFile);
+      if ("error" in result) {
+        return NextResponse.json({ success: false, error: result.error }, { status: 400 });
+      }
+      attachment = result;
+    }
+
+    const kaynak = body.kaynak === "iletisim" ? "iletisim" : "basvuru";
+
+    // Yalnızca bilinen alanları al, string'e çevir, kırp ve uzunluk kontrolü yap
+    const clean: Record<string, string> = {};
+    for (const [field, max] of Object.entries(FIELD_LIMITS)) {
+      const raw = body[field];
+      const value = typeof raw === "string" ? raw.trim() : "";
+      if (value.length > max) {
+        return NextResponse.json(
+          { success: false, error: "Girilen bilgiler çok uzun." },
+          { status: 400 }
+        );
+      }
+      clean[field] = value;
+    }
+
+    const { ad, soyad, eposta, telefon, amac, egitimDurumu, almancaSeviyesi, not } = clean;
 
     if (!ad || !eposta) {
       return NextResponse.json(
@@ -107,12 +224,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!EMAIL_REGEX.test(eposta)) {
+      return NextResponse.json(
+        { success: false, error: "Geçerli bir e-posta adresi girin." },
+        { status: 400 }
+      );
+    }
+
+    // Konu satırında satır sonu olmasın
+    const subjectName = `${ad} ${soyad}`.replace(/[\r\n]+/g, " ");
+    const formTitle = kaynak === "iletisim" ? "İletişim Formu" : "Ön Başvuru";
+
     await transporter.sendMail({
       from: `"Turkish Global Jobs" <${process.env.SMTP_USER}>`,
       to: process.env.NOTIFICATION_EMAIL,
-      subject: `Yeni Ön Başvuru: ${ad} ${soyad}`,
-      html: buildHtml({ ad, soyad, eposta, telefon, amac, egitimDurumu, almancaSeviyesi, not }),
+      subject: `Yeni ${formTitle}: ${subjectName}${attachment ? " (CV ekli)" : ""}`,
+      html: buildHtml(
+        { ad, soyad, eposta, telefon, amac, egitimDurumu, almancaSeviyesi, not },
+        formTitle,
+        !!attachment
+      ),
       replyTo: eposta,
+      attachments: attachment ? [attachment] : undefined,
     });
 
     return NextResponse.json({ success: true });
