@@ -9,6 +9,7 @@ import type { Metadata } from 'next';
 import { Inter, Outfit } from 'next/font/google';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 import CookieConsent from '@/components/analytics/CookieConsent';
+import JsonLd from '@/components/seo/JsonLd';
 import { SITE_URL } from '@/lib/site';
 
 // next/font ile Google Fonts yüklemesi — render-blocking CSS kaldırılır
@@ -71,6 +72,26 @@ export default async function LocaleLayout({
   if (!(routing.locales as readonly string[]).includes(locale)) notFound();
   setRequestLocale(locale);
   const messages = await getMessages();
+  const siteStructuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${SITE_URL}/#organization`,
+        name: 'Turkish Global Jobs',
+        url: SITE_URL,
+        logo: `${SITE_URL}/img/turkishglobal.webp`,
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: 'Turkish Global Jobs',
+        inLanguage: locale,
+        publisher: { '@id': `${SITE_URL}/#organization` },
+      },
+    ],
+  };
 
   return (
     <html lang={locale} className={`${inter.variable} ${outfit.variable}`}>
@@ -79,6 +100,7 @@ export default async function LocaleLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
+        <JsonLd data={siteStructuredData} />
         <Providers>
           <NextIntlClientProvider locale={locale} messages={messages}>
             {children}

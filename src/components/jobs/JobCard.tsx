@@ -1,18 +1,11 @@
 'use client';
 
 import type { Job } from '@prisma/client';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { jobLinkHref } from '@/lib/site';
+import { formatSalary } from '@/lib/jobFormatting';
 import AppIcon from '@/components/ui/AppIcon';
-
-function formatSalary(min?: number | null, max?: number | null): string | null {
-  if (!min && !max) return null;
-  const fmt = (v: number) => v.toLocaleString('de-DE');
-  if (min && max) return `${fmt(min)} – ${fmt(max)} €`;
-  if (min) return `${fmt(min)} € ~`;
-  if (max) return `~ ${fmt(max)} €`;
-  return null;
-}
 
 export default function JobCard({
   job,
@@ -22,13 +15,15 @@ export default function JobCard({
   locale: string;
   onSelect?: (job: Job) => void;
 }) {
+  const t = useTranslations('germanyJobs');
+  const tc = useTranslations('common');
   const title = locale === 'de' ? job.titleDe : job.title;
   const shortDesc = locale === 'de' ? job.shortDescDe : job.shortDesc;
   const salary = formatSalary(job.salaryMin, job.salaryMax);
   const langLevel = job.langLevel ?? null;
 
   return (
-    <div className="job-card">
+    <article className="job-card">
       <span className="job-card-sector">{job.sector}</span>
       <h3 style={{ margin: '8px 0 6px' }}>{title}</h3>
 
@@ -84,21 +79,20 @@ export default function JobCard({
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <Link
-          href="/pre-application"
+          href={`/pre-application?job=${encodeURIComponent(job.id)}`}
           className="btn btn-primary btn-sm"
           style={{ flex: 1, textAlign: 'center' }}
         >
-          Ön Başvuru Yap
+          {t('applyBtn')}
         </Link>
         <Link
-          // Doğrudan dile özel adres (eski /jobs/ adresi 301 yönlendirmeye gidiyordu)
           href={jobLinkHref(locale, job.id)}
           className="btn btn-secondary btn-sm"
           style={{ flex: 1, textAlign: 'center' }}
         >
-          Detayları Gör
+          {tc('viewDetails')}
         </Link>
       </div>
-    </div>
+    </article>
   );
 }

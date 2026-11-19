@@ -3,29 +3,21 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import AppIcon from '@/components/ui/AppIcon';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import { formatSalary } from '@/lib/jobFormatting';
+import { localizedPath } from '@/lib/site';
 import type { Job } from '@prisma/client';
-
-type JobWithCount = Job;
-
-function formatSalary(min?: number | null, max?: number | null): string | null {
-  if (!min && !max) return null;
-  const fmt = (v: number) => v.toLocaleString('de-DE');
-  if (min && max) return `${fmt(min)} – ${fmt(max)} €`;
-  if (min) return `${fmt(min)} € ~`;
-  if (max) return `~ ${fmt(max)} €`;
-  return null;
-}
 
 export default function JobDetailClient({
   job,
   locale,
 }: {
-  job: JobWithCount;
+  job: Job;
   locale: string;
   applied: boolean;
 }) {
+  const t = useTranslations('jobs');
   const tc = useTranslations('common');
-
   const title = locale === 'de' ? job.titleDe : job.title;
   const description = locale === 'de' ? job.descriptionDe : job.description;
   const salary = formatSalary(job.salaryMin, job.salaryMax);
@@ -35,9 +27,11 @@ export default function JobDetailClient({
     <div className="page-wrapper">
       <div className="container">
         <div className="job-detail fade-in">
-          <Link href="/" className="btn btn-secondary btn-sm" style={{ marginBottom: 24 }}>
-            ← {tc('back')}
-          </Link>
+          <Breadcrumbs items={[
+            { name: tc('home'), href: localizedPath(locale, '/') },
+            { name: tc('jobs'), href: localizedPath(locale, '/jobs') },
+            { name: title, href: `${localizedPath(locale, '/jobs')}/${job.id}` },
+          ]} />
 
           <div className="job-detail-header">
             <span className="job-card-sector">{job.sector}</span>
@@ -62,7 +56,7 @@ export default function JobDetailClient({
           </div>
 
           <div className="profile-section">
-            <h2>İş Tanımı</h2>
+            <h2>{t('description')}</h2>
             <div
               className="job-detail-desc"
               style={{ whiteSpace: 'pre-line' }}
@@ -84,7 +78,7 @@ export default function JobDetailClient({
                 textDecoration: 'none',
               }}
             >
-              Başvurmak için buraya tıklayın →
+              {t('applyNow')} →
             </Link>
           </div>
         </div>

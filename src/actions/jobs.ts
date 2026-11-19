@@ -157,3 +157,42 @@ export async function deleteJob(id: string) {
     where: { id: validId },
   });
 }
+
+export async function getRelatedJobs(id: string, sector: string) {
+  if (!idSchema.safeParse(id).success || !sector || sector.length > 200) return [];
+
+  try {
+    return await prisma.job.findMany({
+      where: { isActive: true, sector, id: { not: id } },
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+    });
+  } catch (error) {
+    console.error('Benzer ilanlar çekilirken hata:', error);
+    return [];
+  }
+}
+
+export async function getJobLandingJobs(field: 'sector' | 'location', terms: string[]) {
+  const cleanTerms = [...new Set(terms.map((term) => term.trim()).filter(Boolean))].slice(0, 20);
+  if (cleanTerms.length === 0) return [];
+
+  const filters = cleanTerms.map((term) => ({
+    [field]: { contains: term, mode: 'insensitive' as const },
+  }));
+
+  try {
+    return await prisma.job.findMany({
+      where: { isActive: true, OR: filters },
+      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+    });
+  } catch (error) {
+    console.error('Arama sayfası ilanları çekilirken hata:', error);
+    return [];
+  }
+}
+
+export async function hasJobLandingJobs(field: 'sector' | 'location', terms: string[]) {
+  const jobs = await getJobLandingJobs(field, terms);
+  return jobs.length > 0;
+}

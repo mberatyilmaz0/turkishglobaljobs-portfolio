@@ -239,9 +239,9 @@
     "cvTooLarge": "Die Datei darf maximal 5MB groß sein"
   },
   "germanyJobs": {
-    "heroLabel": "Jobs in Deutschland",
-    "heroTitle": "Bauen Sie Ihre Karriere in Deutschland auf",
-    "heroSubtitle": "Entdecken Sie Stellen mit Blue Card, Chancenkarte und beruflicher Anerkennung.",
+    "heroLabel": "Von der Türkei nach Deutschland",
+    "heroTitle": "Aktuelle Jobs in Deutschland",
+    "heroSubtitle": "Vergleichen Sie Stellen nach Stadt, Branche, Arbeitsmodell, Gehalt und Deutschkenntnissen.",
     "searchPlaceholder": "Position, Stadt oder Branche suchen...",
     "filters": "Filter",
     "resetFilters": "Filter zurücksetzen",
@@ -251,6 +251,8 @@
     "allOptions": "Alle",
     "resultsFound": "Stellen gefunden.",
     "tryDifferentFilters": "Versuchen Sie andere Filter.",
+    "emptySectorTitle": "In dieser Branche gibt es derzeit keine aktiven Stellen",
+    "emptySectorText": "Entdecken Sie andere Branchen oder senden Sie eine Vorab-Bewerbung, um über neue Stellen informiert zu werden.",
     "featured": "Empfohlen",
     "relocationSupport": "Relocation Support",
     "applyBtn": "Voranmeldung",

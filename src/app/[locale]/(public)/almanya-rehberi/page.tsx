@@ -1,365 +1,202 @@
-import { setRequestLocale } from "next-intl/server";
-import { Metadata } from "next";
-import Link from "next/link";
-import { alternatesFor, localizedPath } from "@/lib/site";
-import {
-  FileText,
-  GraduationCap,
-  Wrench,
-  CreditCard,
-  Briefcase,
-  Languages,
-  BookOpen,
-} from "lucide-react";
+import { setRequestLocale } from 'next-intl/server';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { FileText, GraduationCap, Wrench, CreditCard, Briefcase, Languages, BookOpen, ExternalLink } from 'lucide-react';
+import JobLandingLinks from '@/components/jobs/JobLandingLinks';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import { alternatesFor, localizedPath } from '@/lib/site';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  const isDE = locale === "de";
+  const isDE = locale === 'de';
+  const title = isDE ? 'Arbeiten und Leben in Deutschland: Ratgeber' : 'Almanya’da Çalışmak ve Yaşamak: Kapsamlı Rehber';
+  const description = isDE
+    ? 'Praktische Informationen zu Jobsuche, Anerkennung, Sprachkenntnissen, Chancenkarte, Studium und offiziellen Beratungsstellen in Deutschland.'
+    : 'Almanya’da iş bulmak, mesleki denklik, Almanca, Fırsat Kartı, eğitim ve resmî danışma kaynakları hakkında kapsamlı rehber.';
   return {
-    title: isDE ? "Deutschland-Ratgeber" : "Almanya Rehberi: Çalışma, Eğitim ve Yaşam",
-    description: isDE
-      ? "Aktuelle und verlässliche Informationen zu Arbeit, Studium, Chancenkarte, Blauer Karte und Leben in Deutschland."
-      : "Almanya'da çalışma, eğitim, Fırsat Kartı, Mavi Kart, denklik ve yaşam hakkında güncel ve güvenilir bilgiler.",
-    alternates: alternatesFor(locale, "/almanya-rehberi"),
+    title,
+    description,
+    alternates: alternatesFor(locale, '/almanya-rehberi'),
+    openGraph: { title, description, type: 'website', images: [{ url: '/img/turkishglobal.webp', alt: title }] },
   };
 }
 
-// ── Makale kartı verileri ve yönlendirme linkleri ────────────────────────────
-
 const ARTICLES = [
-  {
-    Icon: FileText,
-    title: "Almanya Fırsat Kartı Şartları",
-    desc: "Chancenkarte başvuru koşulları, puan sistemi ve başvuru adımları hakkında kapsamlı rehber.",
-    tag: "Vize & İzin",
-    color: "#2563eb",
-    bg: "#eff6ff",
-    href: "/opportunity-card",
-  },
-  {
-    Icon: GraduationCap,
-    title: "Diploma Denkliği Nasıl Alınır?",
-    desc: "Anabin veritabanı, denklik başvurusu ve tanınma süreçleri adım adım anlatılıyor.",
-    tag: "Eğitim",
-    color: "#7c3aed",
-    bg: "#f5f3ff",
-    href: "/education",
-  },
-  {
-    Icon: Wrench,
-    title: "Ausbildung Başvurusu",
-    desc: "Almanya'da mesleki eğitim programına nasıl başvurulur, gereklilikler neler?",
-    tag: "Mesleki Eğitim",
-    color: "#ea580c",
-    bg: "#fff7ed",
-    href: "/education",
-  },
-  {
-    Icon: CreditCard,
-    title: "Mavi Kart Nedir?",
-    desc: "EU Blue Card başvuru şartları, kapsadığı meslekler ve maaş eşiği bilgileri.",
-    tag: "Vize & İzin",
-    color: "#0891b2",
-    bg: "#ecfeff",
-    href: "/jobs",
-  },
-  {
-    Icon: Briefcase,
-    title: "Hangi Mesleklerde Açık Var?",
-    desc: "Almanya'nın en çok eleman aradığı sektörler ve mesleklerin güncel listesi.",
-    tag: "İş Piyasası",
-    color: "#16a34a",
-    bg: "#f0fdf4",
-    href: "/jobs",
-  },
-  {
-    Icon: Languages,
-    title: "Almanca Dil Seviyeleri",
-    desc: "A1'den C2'ye Almanca dil seviyeleri ve iş-eğitim süreçlerinde hangi seviyenin gerektiği.",
-    tag: "Dil",
-    color: "#d97706",
-    bg: "#fffbeb",
-    href: "/education",
-  },
+  { Icon: FileText, href: '/opportunity-card', color: '#2563eb', bg: '#eff6ff' },
+  { Icon: GraduationCap, href: '/education', color: '#7c3aed', bg: '#f5f3ff' },
+  { Icon: Wrench, href: '/education', color: '#ea580c', bg: '#fff7ed' },
+  { Icon: CreditCard, href: '/opportunity-card', color: '#0891b2', bg: '#ecfeff' },
+  { Icon: Briefcase, href: '/jobs', color: '#16a34a', bg: '#f0fdf4' },
+  { Icon: Languages, href: '/education', color: '#d97706', bg: '#fffbeb' },
 ] as const;
 
-// ── Stiller ──────────────────────────────────────────────────────────────────
+const COPY = {
+  tr: {
+    badge: 'Türkiye’den Almanya’ya Bilgi Merkezi',
+    title: 'Almanya’da Çalışmak ve Yaşamak',
+    subtitle: 'İş arama, mesleki denklik, dil seviyesi ve eğitim süreçlerini anlaşılır adımlarla inceleyin.',
+    topicsLabel: 'Temel Konular',
+    topicsTitle: 'Almanya Yolculuğunuz İçin Rehberler',
+    topicsText: 'İş, eğitim ve oturum seçeneklerini karşılaştırarak size uygun başlangıç noktasını belirleyin.',
+    articles: [
+      { title: 'Almanya Fırsat Kartı Şartları', desc: 'Chancenkarte başvuru koşulları, puan sistemi ve temel başvuru adımlarını inceleyin.', tag: 'Vize ve İzin' },
+      { title: 'Diploma ve Mesleki Denklik', desc: 'Eğitim ve meslek geçmişinizin Almanya’daki tanınma süreci hakkında bilgi alın.', tag: 'Denklik' },
+      { title: 'Ausbildung Başvurusu', desc: 'Mesleki eğitim seçeneklerini ve başvuru sırasında izlenecek adımları öğrenin.', tag: 'Mesleki Eğitim' },
+      { title: 'Mavi Kart ve Çalışma Yolları', desc: 'Nitelikli çalışanlar için çalışma ve oturum seçeneklerini karşılaştırın.', tag: 'Çalışma İzni' },
+      { title: 'Almanya’daki İş Fırsatları', desc: 'Aktif ilanları sektör, şehir ve çalışma modeli açısından karşılaştırın.', tag: 'İş Piyasası' },
+      { title: 'Almanca ve Eğitim Seçenekleri', desc: 'İş ve eğitim hedeflerinizde dil seviyesinin rolünü ve eğitim yollarını inceleyin.', tag: 'Dil ve Eğitim' },
+    ],
+    stepsLabel: 'Başvuru Hazırlığı',
+    stepsTitle: 'Türkiye’den Almanya’ya İş Ararken 5 Adım',
+    stepsText: 'Her başvurunun koşulları farklıdır. Aşağıdaki adımlar hazırlık sürecinizi daha sistematik hâle getirir.',
+    steps: [
+      { title: 'Hedefinizi netleştirin', text: 'Çalışmak istediğiniz meslek, sektör ve şehirleri belirleyin; aktif ilanların beklentilerini profilinizle karşılaştırın.' },
+      { title: 'CV ve belgelerinizi hazırlayın', text: 'Güncel bir CV hazırlayın; diploma, sertifika ve iş deneyimi belgelerinizi düzenli biçimde bir araya getirin.' },
+      { title: 'Denklik koşullarını kontrol edin', text: 'Mesleğinizin denklik veya meslek izni gerektirip gerektirmediğini resmî Anerkennung kaynaklarından kontrol edin.' },
+      { title: 'Dil seviyenizi değerlendirin', text: 'İlanda belirtilen Almanca veya İngilizce beklentisini inceleyin ve gerekiyorsa dil gelişiminizi başvuru planınıza dahil edin.' },
+      { title: 'Hedefli başvuru yapın', text: 'Yalnızca profilinize uyan ilanlara başvurun ve çalışma ile oturum koşullarını güncel resmî bilgilerle doğrulayın.' },
+    ],
+    officialLabel: 'Güvenilir Bilgi',
+    officialTitle: 'Resmî ve Bağımsız Kaynaklar',
+    officialText: 'Vize, çalışma izni ve denklik kuralları değişebilir. Nihai karar öncesinde güncel bilgiyi aşağıdaki resmî kaynaklardan doğrulayın.',
+    officialLinks: [
+      { name: 'Make it in Germany', desc: 'Almanya Federal Hükümeti’nin nitelikli çalışanlar için resmî portalı.', href: 'https://www.make-it-in-germany.com/tr/' },
+      { name: 'Anerkennung in Deutschland', desc: 'Diploma ve mesleki denklik için resmî bilgi ve danışma portalı.', href: 'https://www.anerkennung-in-deutschland.de/html/tr/index.php' },
+      { name: 'Bundesagentur für Arbeit', desc: 'Almanya Federal İş Ajansı’nın iş piyasası ve meslek bilgileri.', href: 'https://www.arbeitsagentur.de/' },
+    ],
+    go: 'Rehberi İncele',
+  },
+  de: {
+    badge: 'Informationen für den Weg von der Türkei nach Deutschland',
+    title: 'Arbeiten und Leben in Deutschland',
+    subtitle: 'Jobsuche, berufliche Anerkennung, Sprachkenntnisse und Bildungswege Schritt für Schritt verstehen.',
+    topicsLabel: 'Grundlegende Themen',
+    topicsTitle: 'Ratgeber für Ihren Weg nach Deutschland',
+    topicsText: 'Vergleichen Sie Arbeits-, Bildungs- und Aufenthaltsoptionen und finden Sie Ihren passenden Ausgangspunkt.',
+    articles: [
+      { title: 'Voraussetzungen der Chancenkarte', desc: 'Voraussetzungen, Punktesystem und wichtige Schritte für die Chancenkarte.', tag: 'Visum und Aufenthalt' },
+      { title: 'Anerkennung von Abschlüssen', desc: 'Informationen zur Anerkennung Ihrer Ausbildung und Berufserfahrung in Deutschland.', tag: 'Anerkennung' },
+      { title: 'Bewerbung für eine Ausbildung', desc: 'Berufliche Bildungswege und die wichtigsten Bewerbungsschritte entdecken.', tag: 'Berufsausbildung' },
+      { title: 'Blaue Karte und Arbeitswege', desc: 'Arbeits- und Aufenthaltsoptionen für qualifizierte Fachkräfte vergleichen.', tag: 'Arbeitserlaubnis' },
+      { title: 'Stellenangebote in Deutschland', desc: 'Aktuelle Stellen nach Branche, Stadt und Arbeitsmodell vergleichen.', tag: 'Arbeitsmarkt' },
+      { title: 'Deutschkenntnisse und Bildung', desc: 'Die Rolle von Sprachkenntnissen und passende Bildungswege kennenlernen.', tag: 'Sprache und Bildung' },
+    ],
+    stepsLabel: 'Vorbereitung der Bewerbung',
+    stepsTitle: 'In 5 Schritten von der Türkei nach Deutschland',
+    stepsText: 'Jede Bewerbung hat eigene Voraussetzungen. Diese Schritte helfen bei einer strukturierten Vorbereitung.',
+    steps: [
+      { title: 'Ziel festlegen', text: 'Bestimmen Sie Beruf, Branche und Region und vergleichen Sie die Anforderungen aktueller Stellen mit Ihrem Profil.' },
+      { title: 'Lebenslauf und Dokumente vorbereiten', text: 'Erstellen Sie einen aktuellen Lebenslauf und ordnen Sie Abschlüsse, Zertifikate und Arbeitszeugnisse.' },
+      { title: 'Anerkennung prüfen', text: 'Prüfen Sie über die offiziellen Anerkennungsportale, ob Ihr Beruf eine Anerkennung oder Berufserlaubnis erfordert.' },
+      { title: 'Sprachniveau bewerten', text: 'Prüfen Sie die geforderten Deutsch- oder Englischkenntnisse und planen Sie bei Bedarf Ihre sprachliche Weiterentwicklung.' },
+      { title: 'Gezielt bewerben', text: 'Bewerben Sie sich auf passende Stellen und bestätigen Sie Arbeits- und Aufenthaltsbedingungen über aktuelle offizielle Informationen.' },
+    ],
+    officialLabel: 'Verlässliche Informationen',
+    officialTitle: 'Offizielle und unabhängige Quellen',
+    officialText: 'Regeln für Visa, Arbeitserlaubnis und Anerkennung können sich ändern. Prüfen Sie aktuelle Informationen vor einer Entscheidung über diese offiziellen Quellen.',
+    officialLinks: [
+      { name: 'Make it in Germany', desc: 'Das Portal der Bundesregierung für qualifizierte Fachkräfte.', href: 'https://www.make-it-in-germany.com/de/' },
+      { name: 'Anerkennung in Deutschland', desc: 'Das offizielle Portal zur Anerkennung ausländischer Berufsqualifikationen.', href: 'https://www.anerkennung-in-deutschland.de/html/de/index.php' },
+      { name: 'Bundesagentur für Arbeit', desc: 'Informationen der Bundesagentur für Arbeit zu Arbeitsmarkt und Berufen.', href: 'https://www.arbeitsagentur.de/' },
+    ],
+    go: 'Ratgeber öffnen',
+  },
+} as const;
 
 const S = {
-  hero: {
-    position: "relative" as const,
-    overflow: "hidden",
-    background: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%)",
-    padding: "96px 24px 80px",
-    textAlign: "center" as const,
-  },
-  heroBlobTR: {
-    position: "absolute" as const,
-    top: "-100px",
-    right: "-100px",
-    width: "440px",
-    height: "440px",
-    borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)",
-    filter: "blur(60px)",
-    pointerEvents: "none" as const,
-  },
-  heroBlobBL: {
-    position: "absolute" as const,
-    bottom: "-80px",
-    left: "-80px",
-    width: "360px",
-    height: "360px",
-    borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(99,102,241,0.14) 0%, transparent 70%)",
-    filter: "blur(60px)",
-    pointerEvents: "none" as const,
-  },
-  heroBadge: {
-    display: "inline-block",
-    padding: "6px 16px",
-    borderRadius: "9999px",
-    border: "1px solid rgba(96,165,250,0.4)",
-    background: "rgba(96,165,250,0.1)",
-    color: "#93c5fd",
-    fontSize: "12px",
-    fontWeight: 600,
-    letterSpacing: "0.12em",
-    textTransform: "uppercase" as const,
-    marginBottom: "16px",
-  },
-  heroH1: {
-    fontSize: "clamp(2rem, 5vw, 3.25rem)",
-    fontWeight: 800,
-    lineHeight: 1.15,
-    color: "#fff",
-    margin: "0 auto 20px",
-    maxWidth: "800px",
-  },
-  heroP: {
-    fontSize: "1.125rem",
-    lineHeight: 1.75,
-    color: "#cbd5e1",
-    maxWidth: "580px",
-    margin: "0 auto",
-  },
-
-  // Grid bölümü
-  section: {
-    background: "#f8fafc",
-    padding: "80px 24px",
-    minHeight: "60vh",
-  },
-  container: {
-    maxWidth: "1100px",
-    margin: "0 auto",
-  },
-  sectionHeader: {
-    marginBottom: "48px",
-    textAlign: "center" as const,
-  },
-  sectionLabel: {
-    fontSize: "12px",
-    fontWeight: 700,
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.12em",
-    color: "#2563eb",
-    display: "block",
-    marginBottom: "10px",
-  },
-  sectionH2: {
-    fontSize: "clamp(1.6rem, 2.5vw, 2.1rem)",
-    fontWeight: 800,
-    color: "#0f172a",
-    margin: "0 0 12px",
-    lineHeight: 1.2,
-  },
-  sectionDesc: {
-    fontSize: "1rem",
-    lineHeight: 1.7,
-    color: "#64748b",
-    maxWidth: "520px",
-    margin: "0 auto",
-  },
-
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-    gap: "24px",
-  },
-
-  card: {
-    background: "#fff",
-    border: "1px solid #e2e8f0",
-    borderRadius: "20px",
-    padding: "28px",
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "0",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-    transition: "box-shadow 0.2s, transform 0.2s, border-color 0.2s",
-    textDecoration: "none",
-  },
-  cardIconBox: (bg: string) => ({
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "52px",
-    height: "52px",
-    borderRadius: "14px",
-    background: bg,
-    marginBottom: "18px",
-    flexShrink: 0,
-  }),
-  cardTag: (color: string) => ({
-    display: "inline-block",
-    fontSize: "11px",
-    fontWeight: 700,
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.08em",
-    color,
-    marginBottom: "8px",
-  }),
-  cardTitle: {
-    fontSize: "1rem",
-    fontWeight: 700,
-    color: "#0f172a",
-    margin: "0 0 10px",
-    lineHeight: 1.35,
-  },
-  cardDesc: {
-    fontSize: "14px",
-    lineHeight: 1.65,
-    color: "#64748b",
-    margin: "0",
-    flexGrow: 1,
-  },
-  cardDivider: {
-    height: "1px",
-    background: "#f1f5f9",
-    margin: "18px 0",
-  },
-  cardCta: (color: string) => ({
-    fontSize: "13px",
-    fontWeight: 600,
-    color,
-    display: "flex",
-    alignItems: "center",
-    gap: "4px",
-  }),
-
-  // Yakında uyarısı
-  comingSoon: {
-    textAlign: "center" as const,
-    marginTop: "56px",
-    padding: "28px 32px",
-    background: "#fff",
-    border: "1px solid #e2e8f0",
-    borderRadius: "16px",
-    maxWidth: "560px",
-    marginLeft: "auto",
-    marginRight: "auto",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-  },
-  comingSoonIcon: {
-    fontSize: "32px",
-    display: "block",
-    marginBottom: "12px",
-  },
-  comingSoonTitle: {
-    fontSize: "15px",
-    fontWeight: 700,
-    color: "#0f172a",
-    margin: "0 0 8px",
-  },
-  comingSoonText: {
-    fontSize: "14px",
-    color: "#64748b",
-    margin: 0,
-    lineHeight: 1.65,
-  },
+  hero: { background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%)', padding: '72px 24px', textAlign: 'center' as const },
+  container: { maxWidth: 1100, margin: '0 auto' },
+  section: { padding: '72px 24px' },
+  label: { color: '#2563eb', fontSize: 12, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.12em' },
+  h2: { color: '#0f172a', fontSize: 'clamp(1.6rem, 3vw, 2.25rem)', lineHeight: 1.25, margin: '10px 0 14px' },
+  text: { color: '#64748b', lineHeight: 1.75 },
 };
 
-// ── Bileşenler ───────────────────────────────────────────────────────────────
-
-function HeroSection() {
-  return (
-    <section style={S.hero}>
-      <div aria-hidden style={S.heroBlobTR} />
-      <div aria-hidden style={S.heroBlobBL} />
-      <div style={{ position: "relative" }}>
-        <span style={S.heroBadge}>Bilgi Merkezi</span>
-        <h1 style={S.heroH1}>Almanya Rehberi</h1>
-        <p style={S.heroP}>
-          Almanya&apos;da çalışma, eğitim ve yaşam hakkında güncel ve güvenilir
-          bilgilendirmeler.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-function ArticlesSection({ locale }: { locale: string }) {
-  return (
-    <section style={S.section}>
-      <div style={S.container}>
-        <div style={S.sectionHeader}>
-          <span style={S.sectionLabel}>Konular</span>
-          <h2 style={S.sectionH2}>Sık Sorulan Konular</h2>
-          <p style={S.sectionDesc}>
-            Almanya sürecinizde bilmeniz gereken temel başlıkları derledik.
-          </p>
-        </div>
-
-        <div style={S.grid}>
-          {ARTICLES.map(({ Icon, title, desc, tag, color, bg, href }) => (
-            <Link
-              key={title}
-              href={localizedPath(locale, href)}
-              style={S.card}
-              className="group hover:shadow-md hover:border-blue-300"
-            >
-              <div style={S.cardIconBox(bg)}>
-                <Icon size={24} color={color} strokeWidth={1.8} />
-              </div>
-              <span style={S.cardTag(color)}>{tag}</span>
-              <h3 style={S.cardTitle}>{title}</h3>
-              <p style={S.cardDesc}>{desc}</p>
-              <div style={S.cardDivider} />
-              <span style={S.cardCta(color)}>
-                Sayfaya Git ›
-              </span>
-            </Link>
-          ))}
-        </div>
-
-        <div style={S.comingSoon}>
-          <span style={S.comingSoonIcon}><BookOpen size={32} color="#2563eb" strokeWidth={1.8} /></span>
-          <h3 style={S.comingSoonTitle}>Daha fazla içerik geliyor</h3>
-          <p style={S.comingSoonText}>
-            Bu sayfaya düzenli olarak yeni rehber makaleleri eklenecektir.
-            Güncel kalmak için sitemizi takip edin.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Sayfa ────────────────────────────────────────────────────────────────────
-
-interface Props {
-  params: Promise<{ locale: string }>;
-}
-
-export default async function AlmanyaRehberiPage({ params }: Props) {
+export default async function AlmanyaRehberiPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const loc = locale === 'de' ? 'de' : 'tr';
+  const copy = COPY[loc];
 
   return (
-    <div>
-      <HeroSection />
-      <ArticlesSection locale={locale} />
-    </div>
+    <main style={{ paddingTop: 72, background: '#f8fafc' }}>
+      <section style={S.hero}>
+        <div style={{ ...S.container, maxWidth: 850 }}>
+          <p style={{ color: '#93c5fd', fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{copy.badge}</p>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(2rem, 5vw, 3.4rem)', lineHeight: 1.15, margin: '16px 0 20px' }}>{copy.title}</h1>
+          <p style={{ color: '#cbd5e1', fontSize: '1.1rem', lineHeight: 1.75, margin: 0 }}>{copy.subtitle}</p>
+        </div>
+      </section>
+
+      <section style={{ ...S.section, background: '#f8fafc' }}>
+        <div style={S.container}>
+          <Breadcrumbs items={[
+            { name: loc === 'de' ? 'Startseite' : 'Ana Sayfa', href: localizedPath(loc, '/') },
+            { name: copy.title, href: localizedPath(loc, '/almanya-rehberi') },
+          ]} />
+          <div style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto 40px' }}>
+            <span style={S.label}>{copy.topicsLabel}</span>
+            <h2 style={S.h2}>{copy.topicsTitle}</h2>
+            <p style={S.text}>{copy.topicsText}</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+            {ARTICLES.map(({ Icon, href, color, bg }, index) => {
+              const article = copy.articles[index];
+              return (
+                <Link key={article.title} href={localizedPath(loc, href)} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 18, padding: 26, textDecoration: 'none' }}>
+                  <div style={{ width: 50, height: 50, borderRadius: 14, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
+                    <Icon size={24} color={color} />
+                  </div>
+                  <span style={{ color, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{article.tag}</span>
+                  <h3 style={{ color: '#0f172a', margin: '8px 0 10px' }}>{article.title}</h3>
+                  <p style={{ ...S.text, fontSize: 14 }}>{article.desc}</p>
+                  <span style={{ color, fontWeight: 600, fontSize: 13 }}>{copy.go} →</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ ...S.section, background: '#fff' }}>
+        <div style={{ ...S.container, maxWidth: 900 }}>
+          <span style={S.label}>{copy.stepsLabel}</span>
+          <h2 style={S.h2}>{copy.stepsTitle}</h2>
+          <p style={{ ...S.text, maxWidth: 760 }}>{copy.stepsText}</p>
+          <ol style={{ listStyle: 'none', padding: 0, margin: '36px 0 0', display: 'grid', gap: 16 }}>
+            {copy.steps.map((step, index) => (
+              <li key={step.title} style={{ display: 'flex', gap: 18, padding: 22, background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16 }}>
+                <span aria-hidden="true" style={{ width: 36, height: 36, flexShrink: 0, borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>{index + 1}</span>
+                <div>
+                  <h3 style={{ color: '#0f172a', margin: '0 0 6px', fontSize: '1rem' }}>{step.title}</h3>
+                  <p style={{ ...S.text, margin: 0 }}>{step.text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section style={{ ...S.section, background: '#f8fafc' }}>
+        <div style={S.container}>
+          <div style={{ textAlign: 'center', maxWidth: 780, margin: '0 auto 36px' }}>
+            <BookOpen size={30} color="#2563eb" />
+            <span style={{ ...S.label, display: 'block', marginTop: 12 }}>{copy.officialLabel}</span>
+            <h2 style={S.h2}>{copy.officialTitle}</h2>
+            <p style={S.text}>{copy.officialText}</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
+            {copy.officialLinks.map((link) => (
+              <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 16, padding: 24, textDecoration: 'none' }}>
+                <h3 style={{ color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8, margin: '0 0 10px' }}>{link.name}<ExternalLink size={16} color="#2563eb" /></h3>
+                <p style={{ ...S.text, margin: 0 }}>{link.desc}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <JobLandingLinks locale={loc} />
+    </main>
   );
 }

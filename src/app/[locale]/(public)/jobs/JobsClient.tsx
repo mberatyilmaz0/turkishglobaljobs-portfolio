@@ -6,28 +6,14 @@ import { Link } from '@/i18n/routing';
 import { jobLinkHref } from '@/lib/site';
 import type { Job } from '@prisma/client';
 import AppIcon from '@/components/ui/AppIcon';
+import { formatSalary } from '@/lib/jobFormatting';
+import { findSectorDefinition, sectorMatches, STANDARD_SECTORS } from '@/lib/sectors';
 
-/* ─── Salary / Relocation / German level helpers ─────────── */
-function getSalaryBadge(sector: string): string {
-  const s = sector.toLowerCase();
-  if (s.includes('it') || s.includes('yazılım') || s.includes('software')) return '3.500 – 5.500 €';
-  if (s.includes('mühendis') || s.includes('ingenieur') || s.includes('engineer')) return '3.200 – 5.000 €';
-  if (s.includes('sağlık') || s.includes('gesundheit') || s.includes('health')) return '2.800 – 4.200 €';
-  if (s.includes('muhasebe') || s.includes('buchhaltung') || s.includes('finance')) return '2.600 – 3.800 €';
-  if (s.includes('lojistik') || s.includes('logistik')) return '2.400 – 3.400 €';
-  return '2.200 – 3.500 €';
-}
-
-function getGermanReq(type: string): string {
-  const t = type.toLowerCase();
-  if (t.includes('full') || t.includes('vollzeit') || t.includes('tam')) return 'B1+';
-  if (t.includes('intern') || t.includes('staj')) return 'A2+';
-  return 'B2+';
-}
+type SelectOption = { value: string; label: string };
 
 /* ─── Custom Select ────────────────────────────────────────── */
 function CustomSelect({ options, value, onChange, placeholder }: {
-  options: string[]; value: string; onChange: (v: string) => void; placeholder: string;
+  options: SelectOption[]; value: string; onChange: (v: string) => void; placeholder: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -36,6 +22,9 @@ function CustomSelect({ options, value, onChange, placeholder }: {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  const selectedOption = options.find((option) => option.value === value);
+  const selectOptions = [{ value: '', label: placeholder }, ...options];
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
@@ -51,30 +40,30 @@ function CustomSelect({ options, value, onChange, placeholder }: {
           transition: 'border-color 0.2s, box-shadow 0.2s',
         }}
       >
-        <span>{value || placeholder}</span>
+        <span>{selectedOption?.label || placeholder}</span>
         <span style={{ fontSize: '0.6rem', color: '#94a3b8', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
       </div>
       {isOpen && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 50,
           background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.12)', overflow: 'hidden',
+          boxShadow: '0 12px 40px rgba(0,0,0,0.12)', maxHeight: 320, overflowY: 'auto',
         }}>
-          {['', ...options].map((opt) => (
+          {selectOptions.map((opt) => (
             <div
-              key={opt || '__all'}
-              onClick={() => { onChange(opt); setIsOpen(false); }}
+              key={opt.value || '__all'}
+              onClick={() => { onChange(opt.value); setIsOpen(false); }}
               style={{
                 padding: '10px 14px', fontSize: '0.875rem', cursor: 'pointer',
-                background: value === opt ? '#eff6ff' : 'transparent',
-                color: value === opt ? '#2563eb' : '#374151',
-                fontWeight: value === opt ? 600 : 400,
+                background: value === opt.value ? '#eff6ff' : 'transparent',
+                color: value === opt.value ? '#2563eb' : '#374151',
+                fontWeight: value === opt.value ? 600 : 400,
                 transition: 'background 0.15s',
               }}
-              onMouseEnter={e => { if (value !== opt) (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
-              onMouseLeave={e => { if (value !== opt) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+              onMouseEnter={e => { if (value !== opt.value) (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+              onMouseLeave={e => { if (value !== opt.value) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
             >
-              {opt || placeholder}
+              {opt.label}
             </div>
           ))}
         </div>
@@ -112,23 +101,37 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
   const [currentPage,        setCurrentPage]        = useState(1);
   const jobsPerPage = 9;
 
-  const sectors     = useMemo(() => [...new Set(initialJobs.map(j => j.sector))].filter(Boolean).sort(),  [initialJobs]);
-  const types       = useMemo(() => [...new Set(initialJobs.map(j => j.type))].filter(Boolean).sort(),    [initialJobs]);
+  const sectors = useMemo(() => {
+    const standard = STANDARD_SECTORS.map((sector) => ({
+      value: sector.value,
+      label: locale === 'de' ? sector.de : sector.tr,
+    }));
+    const custom = [...new Set(initialJobs.map((job) => job.sector).filter(Boolean))]
+      .filter((sector) => !findSectorDefinition(sector))
+      .map((sector) => ({ value: sector, label: sector }));
+    return [...standard, ...custom].sort((a, b) => a.label.localeCompare(b.label, locale));
+  }, [initialJobs, locale]);
 
-  const experiences = useMemo(() => [...new Set(initialJobs.map(j => j.experienceLevel))].filter(Boolean).sort() as string[], [initialJobs]);
+  const types = useMemo(() => [...new Set(initialJobs.map(j => j.type))]
+    .filter(Boolean).sort().map((type) => ({ value: type, label: type })), [initialJobs]);
+
+  const experiences = useMemo(() => ([...new Set(initialJobs.map(j => j.experienceLevel))]
+    .filter(Boolean).sort() as string[]).map((experience) => ({ value: experience, label: experience })), [initialJobs]);
 
   const filteredJobs = useMemo(() => {
     return initialJobs.filter(job => {
       const title = locale === 'de' ? job.titleDe : job.title;
       const desc  = locale === 'de' ? job.descriptionDe : job.description;
       const matchSearch  = title.toLowerCase().includes(searchTerm.toLowerCase()) || desc.toLowerCase().includes(searchTerm.toLowerCase()) || job.location.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchSector  = !selectedSector   || job.sector          === selectedSector;
+      const matchSector  = !selectedSector   || sectorMatches(job.sector, selectedSector);
       const matchType    = !selectedType     || job.type            === selectedType;
       const matchLoc     = !selectedLocation || job.location.toLowerCase().includes(selectedLocation.toLowerCase());
       const matchExp     = !selectedExperience || job.experienceLevel === selectedExperience;
       return matchSearch && matchSector && matchType && matchLoc && matchExp;
     });
   }, [initialJobs, searchTerm, selectedSector, selectedType, selectedLocation, selectedExperience, locale]);
+
+  const selectedSectorHasJobs = !selectedSector || initialJobs.some((job) => sectorMatches(job.sector, selectedSector));
 
   const totalPages    = Math.ceil(filteredJobs.length / jobsPerPage);
   const currentJobs   = filteredJobs.slice((currentPage - 1) * jobsPerPage, currentPage * jobsPerPage);
@@ -217,7 +220,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}><AppIcon name="target" size={34} /></div>
             <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff', marginBottom: '8px', lineHeight: 1.3 }}>{tg('sidebarCtaTitle')}</h3>
             <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)', marginBottom: '16px', lineHeight: 1.6 }}>{tg('sidebarCtaDesc')}</p>
-            <Link href="/on-basvuru" style={{ display: 'block', padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.25)', transition: 'background 0.2s' }}>
+            <Link href="/pre-application" style={{ display: 'block', padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.25)', transition: 'background 0.2s' }}>
               {tg('sidebarCtaBtn')}
             </Link>
           </div>
@@ -234,19 +237,22 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
           {currentJobs.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '80px 24px', background: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
               <div style={{ display: 'flex', justifyContent: 'center', color: '#64748b', marginBottom: '16px' }}><AppIcon name="search" size={46} /></div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>{tc('noResults')}</h3>
-              <p style={{ color: '#64748b', marginBottom: '20px' }}>{tg('tryDifferentFilters')}</p>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                {selectedSector && !selectedSectorHasJobs ? tg('emptySectorTitle') : tc('noResults')}
+              </h3>
+              <p style={{ color: '#64748b', marginBottom: '20px' }}>
+                {selectedSector && !selectedSectorHasJobs ? tg('emptySectorText') : tg('tryDifferentFilters')}
+              </p>
               <button onClick={reset} style={{ padding: '10px 24px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>{tg('resetFilters')}</button>
             </div>
           ) : (
             <>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-                {currentJobs.map((job, idx) => {
+                {currentJobs.map((job) => {
                   const title     = locale === 'de' ? job.titleDe    : job.title;
                   const shortDesc = locale === 'de' ? job.shortDescDe : job.shortDesc;
-                  const salary    = getSalaryBadge(job.sector);
-                  const germanLvl = getGermanReq(job.type);
-                  const relocation = idx % 3 !== 2; // demo: most jobs have relocation support
+                  const salary    = formatSalary(job.salaryMin, job.salaryMax);
+                  const germanLvl = job.langLevel;
 
                   return (
                     <div
@@ -288,28 +294,27 @@ export default function JobsClient({ initialJobs }: { initialJobs: Job[] }) {
                           <AppIcon name="location" size={15} /> {job.location}
                         </div>
 
-                        {/* ── Germany immigration badges ── */}
-                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px', paddingTop: '14px', borderTop: '1px solid #f1f5f9' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', borderRadius: '8px', background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
-                            <AppIcon name="finance" size={14} color="#15803d" />
-                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#15803d' }}>{salary}</span>
+                        {(salary || germanLvl) && (
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px', paddingTop: '14px', borderTop: '1px solid #f1f5f9' }}>
+                            {salary && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', borderRadius: '8px', background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+                                <AppIcon name="finance" size={14} color="#15803d" />
+                                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#15803d' }}>{salary}</span>
+                              </div>
+                            )}
+                            {germanLvl && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', borderRadius: '8px', background: '#f0f9ff', border: '1px solid #bae6fd' }}>
+                                <AppIcon name="globe" size={14} color="#0369a1" />
+                                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#0369a1' }}>{germanLvl}</span>
+                              </div>
+                            )}
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', borderRadius: '8px', background: '#f0f9ff', border: '1px solid #bae6fd' }}>
-                            <AppIcon name="globe" size={14} color="#0369a1" />
-                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#0369a1' }}>Almanca {germanLvl}</span>
-                          </div>
-                          {relocation && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', borderRadius: '8px', background: '#faf5ff', border: '1px solid #e9d5ff' }}>
-                              <AppIcon name="plane" size={14} color="#7c3aed" />
-                              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#7c3aed' }}>{tg('relocationSupport')}</span>
-                            </div>
-                          )}
-                        </div>
+                        )}
 
                         {/* Action buttons */}
                         <div style={{ display: 'flex', gap: '10px' }}>
                           <Link
-                            href="/on-basvuru"
+                            href={`/pre-application?job=${encodeURIComponent(job.id)}`}
                             style={{
                               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
                               padding: '12px', borderRadius: '12px', textDecoration: 'none',

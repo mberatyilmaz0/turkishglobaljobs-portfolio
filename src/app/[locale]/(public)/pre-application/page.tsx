@@ -152,7 +152,7 @@ export default function OnBasvuruPage() {
               {tc('home')}
             </Link>
             <Link
-              href="/almanya-is"
+              href="/jobs"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '6px',
                 fontSize: '0.925rem', fontWeight: 600, color: '#374151',

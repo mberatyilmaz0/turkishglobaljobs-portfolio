@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { getContent } from '@/actions/content';
 import AppIcon from '@/components/ui/AppIcon';
+import AboutDe from '@/components/about/AboutDe';
 import { alternatesFor, localizedPath } from '@/lib/site';
 import {
   ABOUT_PRINCIPLES_DEFAULT,
@@ -201,11 +202,11 @@ export default async function HakkimizdaPage({ params }: Props) {
   setRequestLocale(locale);
 
   const principlesData = await getContent<Bilingual<AboutPrinciplesContent>>('about.principles');
-  // Şu an sayfa sadece TR içeriği gösteriyor (orijinal sayfa TR-only idi)
-  // Locale'e göre seç; yoksa varsayılanı kullan
   const isDE = locale === 'de';
   const principles = (isDE ? principlesData.de : principlesData.tr)
     ?? (isDE ? ABOUT_PRINCIPLES_DEFAULT.de : ABOUT_PRINCIPLES_DEFAULT.tr);
+
+  if (isDE) return <AboutDe principles={principles} />;
 
   return (
     <div>

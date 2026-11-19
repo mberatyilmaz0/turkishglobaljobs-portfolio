@@ -239,9 +239,9 @@
     "cvTooLarge": "Dosya boyutu 5MB'ı aşamaz"
   },
   "germanyJobs": {
-    "heroLabel": "Almanya İş Fırsatları",
-    "heroTitle": "Almanya'da Kariyerinizi İnşa Edin",
-    "heroSubtitle": "Mavi Kart, Fırsat Kartı ve mesleki denklik kapsamındaki iş ilanlarını keşfedin.",
+    "heroLabel": "Türkiye'den Almanya'ya Kariyer",
+    "heroTitle": "Almanya İş İlanları",
+    "heroSubtitle": "Güncel iş ilanlarını şehir, sektör, çalışma modeli, maaş ve Almanca seviyesine göre karşılaştırın.",
     "searchPlaceholder": "Pozisyon, şehir veya sektör ara...",
     "filters": "Filtreler",
     "resetFilters": "Filtreleri Temizle",
@@ -251,6 +251,8 @@
     "allOptions": "Tümü",
     "resultsFound": "ilan bulundu.",
     "tryDifferentFilters": "Farklı filtreler deneyin.",
+    "emptySectorTitle": "Bu sektörde şu anda aktif ilan bulunmuyor",
+    "emptySectorText": "Diğer sektörleri inceleyebilir veya yeni ilanlardan haberdar olmak için ön başvuru formunu doldurabilirsiniz.",
     "featured": "Öne Çıkan",
     "relocationSupport": "Relocation Desteği",
     "applyBtn": "Ön Başvuru Yap",

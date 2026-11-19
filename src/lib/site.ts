@@ -23,6 +23,7 @@ export type Locale = 'tr' | 'de';
 const LOCALIZED_PATHS: Record<string, { tr: string; de: string }> = {
   '/': { tr: '', de: '' },
   '/jobs': { tr: '/almanya-is', de: '/arbeit-in-deutschland' },
+  '/job-search': { tr: '/is-ilanlari', de: '/stellensuche' },
   '/opportunity-card': { tr: '/firsat-karti', de: '/chancenkarte' },
   '/education': { tr: '/almanya-egitim', de: '/bildung-in-deutschland' },
   '/pre-application': { tr: '/on-basvuru', de: '/vorab-bewerbung' },

@@ -26,6 +26,10 @@ export const routing = defineRouting({
       tr: '/almanya-is/[id]',
       de: '/arbeit-in-deutschland/[id]',
     },
+    '/job-search/[slug]': {
+      tr: '/is-ilanlari/[slug]',
+      de: '/stellensuche/[slug]',
+    },
   },
 });
 
