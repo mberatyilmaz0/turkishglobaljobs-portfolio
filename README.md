@@ -4,6 +4,22 @@ Türkçe ve Almanca dil desteğine sahip, Almanya odaklı kariyer ve danışmanl
 
 Proje; Next.js 16 App Router, React 19, TypeScript, Prisma 7, PostgreSQL, Auth.js v5 ve next-intl üzerine inşa edilmiştir.
 
+**Canlı site:** [turkishglobaljobs.com](https://turkishglobaljobs.com/tr)
+
+## Ekran görüntüleri
+
+| Ana sayfa | İş ilanları |
+|---|---|
+| ![Ana sayfa](docs/screenshots/ana-sayfa.png) | ![İş ilanları ve filtreler](docs/screenshots/is-ilanlari.png) |
+
+| Ön başvuru formu | Almanca arayüz |
+|---|---|
+| ![Ön başvuru formu](docs/screenshots/on-basvuru.png) | ![Almanca arayüz](docs/screenshots/almanca.png) |
+
+Mobil görünüm:
+
+<img src="docs/screenshots/mobil.png" alt="Mobil görünüm" width="260">
+
 ## Özellikler
 
 ### Ziyaretçiler
